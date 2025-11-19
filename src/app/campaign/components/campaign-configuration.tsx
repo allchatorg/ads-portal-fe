@@ -5,13 +5,15 @@ import { AdType } from "@/models/adType";
 import { CampaignDetails, ValidationErrors } from "@/hooks/use-campaign-creator";
 import { AdOption } from "@/models/AdOption";
 import { Slider } from "@/components/ui/slider";
-import { AlertCircle, CheckCircle2, Upload, X, ChevronLeft } from "lucide-react";
+import { AlertCircle, CheckCircle2, Upload, X, ChevronLeft, Info } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/ui/action-button";
 
 interface CampaignConfigurationProps {
     adType: AdType;
@@ -79,7 +81,7 @@ export default function CampaignConfiguration({
     return (
         <div className="w-full max-w-4xl mx-auto">
             <Card className="w-full border-slate-200 shadow-sm">
-                <CardHeader className="bg-slate-50 border-b border-slate-200 px-8 py-6">
+                <CardHeader className="border-b border-slate-200 px-8 py-6">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
                             <currentOption.icon className="w-6 h-6 text-indigo-600" />
@@ -207,9 +209,6 @@ export default function CampaignConfiguration({
                                     onValueChange={(vals) => setDetails(prev => ({ ...prev, views: vals[0] }))}
                                     className="py-4"
                                 />
-                                <p className="text-xs text-slate-500">
-                                    Estimated reach based on your budget and targeting options.
-                                </p>
                             </div>
                         </div>
 
@@ -217,13 +216,23 @@ export default function CampaignConfiguration({
                         <div className="lg:col-span-1 flex flex-col justify-end">
                             <div className="bg-slate-900 rounded-xl p-6 text-white">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-slate-400">Price per 1,000 views (CPM)</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-slate-400">Price per 1,000 views (CPM)</span>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="w-4 h-4 text-slate-500 hover:text-slate-300 transition-colors" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="max-w-xs">Cost Per Mille (CPM) is the cost for every 1,000 views of your advertisement.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
                                     <span className="font-medium">${currentOption.pricePerMille.toFixed(2)}</span>
                                 </div>
                                 <div className="h-px bg-slate-800 my-4" />
                                 <div className="flex items-center justify-between text-lg">
                                     <span className="font-semibold">Total Estimated Cost</span>
-                                    <span className="font-bold text-2xl text-green-400">
+                                    <span className="font-bold text-2xl text-indigo-300">
                                         ${totalPrice.toFixed(2)}
                                     </span>
                                 </div>
@@ -232,7 +241,7 @@ export default function CampaignConfiguration({
                     </div>
                 </CardContent>
 
-                <CardFooter className="bg-slate-50 px-8 py-6 border-t border-slate-200 flex items-center justify-between">
+                <CardFooter className="px-8 py-6 border-t border-slate-200 flex items-center justify-between">
                     <Button
                         variant="ghost"
                         onClick={onBack}
@@ -241,13 +250,25 @@ export default function CampaignConfiguration({
                         <ChevronLeft className="w-4 h-4 mr-2" />
                         Back
                     </Button>
-                    <Button
-                        onClick={onNext}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200"
-                    >
-                        Next Step
-                        <CheckCircle2 className="w-4 h-4 ml-2" />
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <div className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors cursor-help">
+                                    <Info className="w-4 h-4" />
+                                    <span className="text-xs">Approval Process</span>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="max-w-xs">After purchasing the ad, it will go through an approval process and will only become active once approved.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <ActionButton
+                            onClick={onNext}
+                            icon={CheckCircle2}
+                        >
+                            Next Step
+                        </ActionButton>
+                    </div>
                 </CardFooter>
             </Card>
         </div>
