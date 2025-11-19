@@ -5,6 +5,13 @@ import {AdOption} from "@/models/AdOption";
 import {AdType} from "@/models/adType";
 import {AdCard} from "@/app/campaign/components/ad-card";
 
+// Define props interface
+interface AdCampaignSelectorProps {
+    selectedAd: AdType;
+    onSelect: (type: AdType) => void;
+    onNext: () => void;
+}
+
 const AD_OPTIONS: AdOption[] = [
     {
         id: 'text',
@@ -33,15 +40,14 @@ const AD_OPTIONS: AdOption[] = [
     }
 ];
 
+export default function AdCampaignSelector({
+                                               selectedAd,
+                                               onSelect,
+                                               onNext
+                                           }: AdCampaignSelectorProps) {
 
-export default function AdCampaignSelector() {
-    const [selectedAd, setSelectedAd] = useState<AdType>('photo');
-    const [currentMobileIndex, setCurrentMobileIndex] = useState(1); // Start at middle option (photo)
-
-    // Handle selection logic
-    const handleSelect = (id: AdType) => {
-        setSelectedAd(id);
-    };
+    // We keep carousel index local as it's purely UI/View state
+    const [currentMobileIndex, setCurrentMobileIndex] = useState(1);
 
     // Mobile Carousel Logic
     const nextSlide = () => {
@@ -52,15 +58,9 @@ export default function AdCampaignSelector() {
         setCurrentMobileIndex((prev) => (prev === 0 ? AD_OPTIONS.length - 1 : prev - 1));
     };
 
-    // Sync selection when swiping (optional, but nice UX)
-    const handleMobileSelect = () => {
-        handleSelect(AD_OPTIONS[currentMobileIndex].id);
-    };
-
     return (
-        <div className=" flex flex-col items-center justify-center font-sans">
-            <div className="">
-
+        <div className="flex flex-col items-center justify-center font-sans">
+            <div>
                 {/* Header Section */}
                 <div className="text-center space-y-4 mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -79,7 +79,7 @@ export default function AdCampaignSelector() {
                             <AdCard
                                 option={option}
                                 isSelected={selectedAd === option.id}
-                                onSelect={handleSelect}
+                                onSelect={onSelect} // Uses prop function
                             />
                         </div>
                     ))}
@@ -87,22 +87,16 @@ export default function AdCampaignSelector() {
 
                 {/* --- MOBILE VIEW (Carousel) --- */}
                 <div className="md:hidden relative w-full max-w-md mx-auto">
-
                     {/* Carousel Container */}
                     <div className="relative h-[480px] w-full perspective-1000">
                         {AD_OPTIONS.map((option, index) => {
-                            // Determine visibility state only for the current index to simulate a carousel
-                            // In a real app, we might map all and transform them, but here we just show active
-                            // We will render the active one.
-
                             if (index !== currentMobileIndex) return null;
-
                             return (
                                 <div key={option.id} className="animate-in fade-in zoom-in duration-300 h-full">
                                     <AdCard
                                         option={option}
                                         isSelected={selectedAd === option.id}
-                                        onSelect={handleSelect}
+                                        onSelect={onSelect} // Uses prop function
                                         className="shadow-xl"
                                     />
                                 </div>
@@ -138,9 +132,9 @@ export default function AdCampaignSelector() {
                                 key={idx}
                                 onClick={() => setCurrentMobileIndex(idx)}
                                 className={`
-                                          h-2 rounded-full transition-all duration-300
-                                          ${idx === currentMobileIndex ? 'w-8 bg-indigo-600' : 'w-2 bg-slate-300'}
-                        `}
+                                    h-2 rounded-full transition-all duration-300
+                                    ${idx === currentMobileIndex ? 'w-8 bg-indigo-600' : 'w-2 bg-slate-300'}
+                                `}
                             />
                         ))}
                     </div>
@@ -150,6 +144,8 @@ export default function AdCampaignSelector() {
                         Tap card to select
                     </p>
                 </div>
+
+                {/* Footer / Continue Section */}
                 <div
                     className="mt-12 bg-white rounded-xl p-6 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex items-center gap-3">
@@ -164,11 +160,11 @@ export default function AdCampaignSelector() {
                         </div>
                     </div>
                     <button
+                        onClick={onNext} // Trigger the Hook's nextStep function
                         className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md shadow-indigo-200">
-                        Continue to Creative
+                        Continue to Configuration
                     </button>
                 </div>
-
             </div>
         </div>
     );
