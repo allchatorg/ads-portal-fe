@@ -1,24 +1,18 @@
 "use client"
 
 import * as React from "react"
-import {Badge} from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { AdApprovalState, AdItem, AdType } from "@/models/ad-item";
 
-export type AdApprovalState = "rejected" | "pending" | "running" | "completed"
-export type AdType = "text" | "photo" | "video"
-
-export interface AdItem {
-    id: number
-    title: string
-    adType: "text" | "photo" | "video"
-    viewsBought: number
-    price: number
-    totalPricePaid: number
-    purchaseDate: string
-    startDate: string
-    approvalState: AdApprovalState
-}
-
-export function AdsTable({ads}: { ads: AdItem[] }) {
+export function AdsTable({ ads }: { ads: AdItem[] }) {
     const rows = React.useMemo(
         () => ads.filter((a) => a.approvalState === "pending" || a.approvalState === "running"),
         [ads]
@@ -49,68 +43,66 @@ export function AdsTable({ads}: { ads: AdItem[] }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white">
-            <div className="overflow-x-auto">
-                <table className="w-full caption-bottom text-sm">
-                    <thead>
-                    <tr className="border-b bg-gray-50">
-                        <th className="h-12 px-4 text-left align-middle font-semibold text-gray-900">Title</th>
-                        <th className="h-12 px-4 text-left align-middle font-semibold text-gray-900">Type</th>
-                        <th className="h-12 px-4 text-right align-middle font-semibold text-gray-900">Views Bought</th>
-                        <th className="h-12 px-4 text-right align-middle font-semibold text-gray-900">Price</th>
-                        <th className="h-12 px-4 text-right align-middle font-semibold text-gray-900">Total Paid</th>
-                        <th className="h-12 px-4 text-left align-middle font-semibold text-gray-900">Purchase Date</th>
-                        <th className="h-12 px-4 text-left align-middle font-semibold text-gray-900">Start Date</th>
-                        <th className="h-12 px-4 text-left align-middle font-semibold text-gray-900">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+        <div className="rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead className="text-right">Views Bought</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-right">Total Paid</TableHead>
+                        <TableHead>Purchase Date</TableHead>
+                        <TableHead>Start Date</TableHead>
+                        <TableHead>Status</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {rows.length === 0 ? (
-                        <tr>
-                            <td colSpan={8} className="h-32 text-center text-gray-500">
+                        <TableRow>
+                            <TableCell colSpan={8} className="h-24 text-center">
                                 <div className="flex flex-col items-center justify-center gap-2 py-8">
                                     <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
+                                        viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                     </svg>
-                                    <p className="font-medium">No running or pending ads</p>
+                                    <p className="font-medium text-muted-foreground">No running or pending ads</p>
                                 </div>
-                            </td>
-                        </tr>
+                            </TableCell>
+                        </TableRow>
                     ) : (
                         rows.map((ad) => (
-                            <tr key={ad.id} className="border-b transition-colors hover:bg-gray-50">
-                                <td className="p-4 align-middle font-medium text-gray-900">{ad.title}</td>
-                                <td className="p-4 align-middle">
+                            <TableRow key={ad.id}>
+                                <TableCell className="font-medium">{ad.title}</TableCell>
+                                <TableCell>
                                     <Badge variant="outline"
-                                           className={`px-2.5 py-0.5 capitalize font-medium ${getTypeColor(ad.adType)}`}>
+                                        className={`px-2.5 py-0.5 capitalize font-medium ${getTypeColor(ad.adType)}`}>
                                         {ad.adType}
                                     </Badge>
-                                </td>
-                                <td className="p-4 align-middle text-right font-medium text-gray-900">
+                                </TableCell>
+                                <TableCell className="text-right">
                                     {ad.viewsBought.toLocaleString()}
-                                </td>
-                                <td className="p-4 align-middle text-right font-medium text-gray-900">
+                                </TableCell>
+                                <TableCell className="text-right">
                                     ${ad.price.toFixed(2)}
-                                </td>
-                                <td className="p-4 align-middle text-right font-semibold text-gray-900">
+                                </TableCell>
+                                <TableCell className="text-right font-semibold">
                                     ${ad.totalPricePaid.toFixed(2)}
-                                </td>
-                                <td className="p-4 align-middle text-gray-600">{formatDate(ad.purchaseDate)}</td>
-                                <td className="p-4 align-middle text-gray-600">{formatDate(ad.startDate)}</td>
-                                <td className="p-4 align-middle">
+                                </TableCell>
+                                <TableCell className="text-muted-foreground">{formatDate(ad.purchaseDate)}</TableCell>
+                                <TableCell className="text-muted-foreground">{formatDate(ad.startDate)}</TableCell>
+                                <TableCell>
                                     <Badge variant={getStatusVariant(ad.approvalState)}
-                                           className="px-2.5 py-0.5 capitalize font-medium">
+                                        className="px-2.5 py-0.5 capitalize font-medium">
                                         {ad.approvalState}
                                     </Badge>
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
                         ))
                     )}
-                    </tbody>
-                </table>
-            </div>
+                </TableBody>
+            </Table>
         </div>
     )
 }
