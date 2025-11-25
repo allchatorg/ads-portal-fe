@@ -1,6 +1,6 @@
-import { StatCard } from "@/components/stat-card";
-import { NotifyCard } from "@/components/NotifyCard";
-import { CompletionCard } from "@/components/CompletionCard";
+import {StatCard} from "@/components/stat-card";
+import {NotifyCard} from "@/components/NotifyCard";
+import {CompletionCard} from "@/components/CompletionCard";
 import Link from "next/link";
 
 const statsData = [
@@ -8,7 +8,7 @@ const statsData = [
         id: 1,
         title: "Total Ad Views Today",
         value: "12,345",
-        trend: "up",
+        trend: "up" as const,
         trendValue: "+8%",
         footerText: "Compared to yesterday",
         description: "Total views across all ads",
@@ -70,7 +70,7 @@ export function SectionCards() {
                         value={card.value}
                         label={card.label}
                         description={card.description}
-                        variant={card.variant as any}
+                        variant={card.variant as "default" | "success" | "warning" | "destructive"}
                     />
                 </Link>
             ))}
