@@ -18,7 +18,7 @@ export function useUser() {
         id: "mock-user-id",
         name: "Mock User",
         email: "user@example.com",
-        role: UserRole.ADMIN, // Change to UserRole.ADMIN to test admin features
+        role: UserRole.USER, // Change to UserRole.ADMIN to test admin features
     }
 
     const isLoading = false

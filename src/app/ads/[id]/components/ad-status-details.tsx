@@ -1,18 +1,24 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
 import {AdStatusDetails as AdStatusDetailsType} from "@/models/ad-status-details";
 import {clsx} from "clsx";
-import {AlertCircle, Calendar, CreditCard, DollarSign, Eye, Info, TrendingUp} from "lucide-react";
+import {AlertCircle, Calendar, CheckCircle, CreditCard, DollarSign, Eye, Info, TrendingUp} from "lucide-react";
 import * as React from "react";
+import {RejectAdModal} from "@/app/ads/[id]/components/reject-ad-modal";
 
 interface AdStatusDetailsProps {
     data: AdStatusDetailsType;
     className?: string;
+    isAdmin?: boolean;
+    onApprove?: () => void;
+    onReject?: (reason: string) => void;
 }
 
-export function AdStatusDetails({data, className}: AdStatusDetailsProps) {
+export function AdStatusDetails({data, className, isAdmin = false, onApprove, onReject}: AdStatusDetailsProps) {
     const isActive = data.approvalState === "active" || data.approvalState === "completed";
-    const showStats = isActive;
+    const isSubmitted = data.approvalState === "submitted";
+    const showAdminActions = isAdmin && isSubmitted;
 
     // Status-based styling
     const getStatusConfig = () => {
@@ -164,6 +170,39 @@ export function AdStatusDetails({data, className}: AdStatusDetailsProps) {
                     </div>
                 </div>
 
+                {/* Admin Actions Section - Bottom Right */}
+                {showAdminActions && (
+                    <div className="border-t pt-6 mt-6">
+                        <div className="flex justify-end">
+                            <div
+                                className="w-full sm:w-auto sm:min-w-[360px] sm:max-w-md p-4 rounded-lg bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-200 dark:border-purple-900 shadow-sm">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div
+                                        className="h-7 w-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                        <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400"/>
+                                    </div>
+                                    <h3 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
+                                        Review Required
+                                    </h3>
+                                </div>
+                                <p className="text-xs text-purple-700 dark:text-purple-300 mb-4 leading-relaxed">
+                                    Review the ad content and take action.
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                    <Button
+                                        onClick={onApprove}
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                    >
+                                        <CheckCircle className="mr-2 h-4 w-4"/>
+                                        Approve Ad
+                                    </Button>
+                                    {onReject && <RejectAdModal onReject={onReject}/>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Conditional Rejection Section */}
                 {data.approvalState === "rejected" && data.rejectionReason && (
                     <div className="border-t pt-6 mt-6">
@@ -183,7 +222,7 @@ export function AdStatusDetails({data, className}: AdStatusDetailsProps) {
                 )}
 
                 {/* Conditional Pending Section */}
-                {data.approvalState === "submitted" && (
+                {data.approvalState === "submitted" && !showAdminActions && (
                     <div className="border-t pt-6 mt-6">
                         <div
                             className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900">

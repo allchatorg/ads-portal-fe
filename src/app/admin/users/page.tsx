@@ -1,21 +1,69 @@
+"use client"
+
 import {SiteHeader} from "@/components/site-header"
+import {UsersTable} from "@/components/users-table"
+import {useUsersParams} from "@/hooks/use-users-params"
+import {MOCK_USERS} from "@/data/mock-users"
+import {useMemo} from "react"
 
 export default function AdminUsersPage() {
+    const {
+        sort,
+        searchQuery,
+        setSort,
+        setSearchQuery,
+        clearParams
+    } = useUsersParams()
+
+    const filteredUsers = useMemo(() => {
+        let result = [...MOCK_USERS]
+
+        // Search filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase()
+            result = result.filter(user =>
+                user.email.toLowerCase().includes(query) ||
+                user.id.toLowerCase().includes(query) ||
+                user.name.toLowerCase().includes(query)
+            )
+        }
+
+        // Sort
+        const [sortField, sortOrder] = sort.split(",")
+
+        result.sort((a, b) => {
+            let valA = a[sortField as keyof typeof a]
+            let valB = b[sortField as keyof typeof b]
+
+            // Handle numeric sorting
+            if (sortField === 'totalPurchasedAds' || sortField === 'totalSpent') {
+                valA = Number(valA)
+                valB = Number(valB)
+            }
+
+            if (valA < valB) return sortOrder === "asc" ? -1 : 1
+            if (valA > valB) return sortOrder === "asc" ? 1 : -1
+            return 0
+        })
+
+        return result
+    }, [sort, searchQuery])
+
     return (
-        <div>
+        <div className="w-full">
             <SiteHeader
                 title="Users Management"
-                description="Manage platform users and permissions"
+                description="Manage platform users and view their activity"
             />
-            <div className="w-full flex flex-1 flex-col">
-                <div className="@container/main flex flex-1 flex-col gap-2">
-                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                        <div className="px-4 lg:px-6">
-                            {/* Add your users management content here */}
-                            <p className="text-muted-foreground">Users management content goes here...</p>
-                        </div>
-                    </div>
-                </div>
+            <div className="w-full px-4 lg:px-6 py-4 md:gap-6 md:py-6">
+                <UsersTable
+                    users={filteredUsers}
+                    sort={sort}
+                    onSortChange={setSort}
+                    searchQuery={searchQuery}
+                    onSearchQueryChange={setSearchQuery}
+                    onClearFilters={clearParams}
+                />
             </div>
         </div>
     )
