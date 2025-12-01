@@ -19,7 +19,7 @@ const mockAdStatusData: AdStatusDetailsType = {
     totalPricePaid: 2500,
     purchaseDate: "2024-06-01",
     startDate: "2024-06-15",
-    approvalState: "rejected",
+    approvalState: "submitted",
     rejectionReason: "Innapropriate content, your payment will be refunded.",
     paymentCardLast4: "4242",
     paymentCardBrand: "visa",

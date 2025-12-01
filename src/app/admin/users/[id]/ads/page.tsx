@@ -95,7 +95,7 @@ export default function UserAdsPage() {
                             <p className="text-2xl font-bold text-orange-600">
                                 {userAds.filter(ad => ad.approvalState === 'submitted').length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Pending Ads</p>
+                            <p className="text-sm text-muted-foreground">Submitted Ads</p>
                         </div>
                     </div>
                 </CardContent>

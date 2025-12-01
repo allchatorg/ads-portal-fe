@@ -7,10 +7,12 @@ import {AppSidebar} from "@/components/app-sidebar"
 export function ConditionalLayout({children}: { children: React.ReactNode }) {
     const pathname = usePathname()
     const isHomePage = pathname === "/"
+    const isAuthPage = pathname === "/auth" || pathname.startsWith("/auth?") || pathname === "/login" || pathname === "/signup"
 
-    if (isHomePage) {
+    if (isHomePage || isAuthPage) {
         return <>{children}</>
     }
+
 
     return (
         <SidebarProvider

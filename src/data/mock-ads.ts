@@ -1,3 +1,4 @@
+// Aligned MOCK_ADS
 import {AdItem} from "@/models/ad-item";
 
 export const MOCK_ADS: AdItem[] = [
@@ -12,7 +13,7 @@ export const MOCK_ADS: AdItem[] = [
         startDate: "2024-06-01T00:00:00Z",
         approvalState: "active",
         username: "john.doe@example.com",
-        userId: "user-001"
+        userId: "u_1"
     },
     {
         id: 2,
@@ -24,8 +25,8 @@ export const MOCK_ADS: AdItem[] = [
         purchaseDate: "2024-05-20T14:30:00Z",
         startDate: "2024-06-05T00:00:00Z",
         approvalState: "submitted",
-        username: "sarah.smith@example.com",
-        userId: "user-002"
+        username: "jane.smith@example.com",
+        userId: "u_2"
     },
     {
         id: 3,
@@ -37,8 +38,8 @@ export const MOCK_ADS: AdItem[] = [
         purchaseDate: "2024-05-10T09:15:00Z",
         startDate: "2024-05-25T00:00:00Z",
         approvalState: "completed",
-        username: "mike.jones@example.com",
-        userId: "user-003"
+        username: "bob.jones@example.com",
+        userId: "u_3"
     },
     {
         id: 4,
@@ -50,8 +51,8 @@ export const MOCK_ADS: AdItem[] = [
         purchaseDate: "2024-05-22T11:00:00Z",
         startDate: "2024-06-10T00:00:00Z",
         approvalState: "rejected",
-        username: "emily.brown@example.com",
-        userId: "user-004"
+        username: "alice.williams@example.com",
+        userId: "u_4"
     },
     {
         id: 5,
@@ -64,7 +65,7 @@ export const MOCK_ADS: AdItem[] = [
         startDate: "2024-06-02T00:00:00Z",
         approvalState: "active",
         username: "john.doe@example.com",
-        userId: "user-001"
+        userId: "u_1"
     },
     {
         id: 6,
@@ -76,7 +77,7 @@ export const MOCK_ADS: AdItem[] = [
         purchaseDate: "2024-05-25T13:20:00Z",
         startDate: "2024-06-08T00:00:00Z",
         approvalState: "submitted",
-        username: "alex.wilson@example.com",
-        userId: "user-005"
+        username: "charlie.brown@example.com",
+        userId: "u_5"
     }
 ];
