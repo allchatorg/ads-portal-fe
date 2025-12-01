@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
+import {ActionButton} from "@/components/ui/action-button";
 import {AlertTriangle, XCircle} from "lucide-react";
 import {
     Dialog,
@@ -50,10 +51,13 @@ export function RejectAdModal({onReject}: RejectAdModalProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="destructive" className="flex-1 sm:flex-none">
+                <ActionButton
+                    variant="negative"
+                    className="flex-1 sm:flex-none"
+                >
                     <XCircle className="mr-2 h-4 w-4"/>
                     Reject Ad
-                </Button>
+                </ActionButton>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
@@ -97,13 +101,13 @@ export function RejectAdModal({onReject}: RejectAdModalProps) {
                         >
                             Cancel
                         </Button>
-                        <Button
+                        <ActionButton
                             type="submit"
-                            variant="destructive"
+                            variant="negative"
                             className="flex-1"
                         >
                             Confirm Rejection
-                        </Button>
+                        </ActionButton>
                     </div>
                 </form>
             </DialogContent>

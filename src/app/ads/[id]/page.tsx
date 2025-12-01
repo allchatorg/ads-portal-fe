@@ -3,11 +3,6 @@ import {SiteHeader} from "@/components/site-header";
 import {AdDetailsStats} from "@/app/ads/[id]/components/ad-details-stats";
 import {AdStatusDetails} from "@/app/ads/[id]/components/ad-status-details";
 import {AdStatusDetails as AdStatusDetailsType} from "@/models/ad-status-details";
-import {useUser} from "@/hooks/use-user";
-import {UserRole} from "@/models/user-role";
-import {Button} from "@/components/ui/button";
-import {CheckCircle} from "lucide-react";
-import {RejectAdModal} from "@/app/ads/[id]/components/reject-ad-modal";
 
 // Mock data for demonstration - replace with actual API data
 const mockAdStatusData: AdStatusDetailsType = {
@@ -29,35 +24,7 @@ const mockAdStatusData: AdStatusDetailsType = {
     userId: "user-123",
 };
 
-export default function Page() {
-    const {user} = useUser();
-    const isAdmin = user?.role === UserRole.ADMIN;
-    const isSubmitted = mockAdStatusData.approvalState === "submitted";
-
-    const handleApprove = () => {
-        console.log("Ad approved - ID:", mockAdStatusData.id);
-        // TODO: Implement API call to approve ad
-    };
-
-    const handleReject = (reason: string) => {
-        console.log("Ad rejected - ID:", mockAdStatusData.id);
-        console.log("Rejection reason:", reason || "No reason provided");
-        // TODO: Implement API call to reject ad
-    };
-
-    const actions = isAdmin && isSubmitted ? (
-        <>
-            <Button
-                onClick={handleApprove}
-                className="bg-green-600 hover:bg-green-700 text-white"
-            >
-                <CheckCircle className="mr-2 h-4 w-4"/>
-                Approve
-            </Button>
-            <RejectAdModal onReject={handleReject}/>
-        </>
-    ) : null;
-
+export default function UserAdDetailsPage() {
     return (
         <div>
             <SiteHeader
@@ -69,14 +36,13 @@ export default function Page() {
                     <div className="flex flex-col gap-4">
                         <AdDetailsStats
                             approvalState={mockAdStatusData.approvalState}
-                            isAdmin={isAdmin}
-                            actions={actions}
+                            isAdmin={false}
                         />
 
                         <AdStatusDetails
                             className="m-4"
                             data={mockAdStatusData}
-                            isAdmin={isAdmin}
+                            isAdmin={false}
                         />
                     </div>
                 </div>

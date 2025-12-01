@@ -304,7 +304,7 @@ export function AdsTable({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => router.push(viewDetailsPath ? `${viewDetailsPath}` : `/ads/${ad.id}`)}
+                                            onClick={() => router.push(viewDetailsPath ? `${viewDetailsPath}` : `/admin/ads/${ad.id}`)}
                                         >
                                             View Details
                                             <Eye className="ml-2 h-4 w-4"/>
