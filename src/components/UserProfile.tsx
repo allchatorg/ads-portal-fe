@@ -1,6 +1,6 @@
 "use client";
-import {useAppSelector} from "@/store/hooks";
-import {selectCurrentUser, selectIsAdmin, selectIsAuthenticated} from "@/store/slices/authSlice";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated, selectIsAdmin } from "@/store/slices/authSlice";
 
 /**
  * Example component showing how to access user data from Redux state

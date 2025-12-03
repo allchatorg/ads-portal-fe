@@ -1,16 +1,16 @@
 "use client";
-import {useForm} from "react-hook-form";
-import {cn} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
-import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {AlertTriangle} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {useLoginMutation} from "@/store/services/userApi";
-import {useAppDispatch} from "@/store/hooks";
-import {setUser} from "@/store/slices/authSlice";
+import { useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLoginMutation } from "@/store/services/userApi";
+import { useAppDispatch } from "@/store/hooks";
+import { setUser } from "@/store/slices/authSlice";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -23,20 +23,20 @@ interface LoginRequest {
 }
 
 export function LoginForm({
-                              className,
-                              onAuthViewChange,
-                              ...props
-                          }: React.ComponentPropsWithoutRef<"div"> & {
+    className,
+    onAuthViewChange,
+    ...props
+}: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [login, {isLoading, error: apiError}] = useLoginMutation();
+    const [login, { isLoading, error: apiError }] = useLoginMutation();
 
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm<LoginRequest>();
 
     const onSubmit = async (data: LoginRequest) => {
@@ -126,7 +126,7 @@ export function LoginForm({
 
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4"/>
+                                <AlertTriangle className="h-4 w-4" />
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)

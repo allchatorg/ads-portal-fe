@@ -1,6 +1,6 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {RootState} from '../store';
-import {Role, userApi} from '../services/userApi';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
+import { Role, userApi } from '../services/userApi';
 
 export interface AuthUser {
     id: number;
@@ -37,14 +37,14 @@ export const authSlice = createSlice({
         builder
             .addMatcher(
                 userApi.endpoints.login.matchFulfilled,
-                (state, {payload}) => {
+                (state, { payload }) => {
                     state.user = payload;
                     state.isAuthenticated = true;
                 }
             )
             .addMatcher(
                 userApi.endpoints.register.matchFulfilled,
-                (state, {payload}) => {
+                (state, { payload }) => {
                     state.user = payload;
                     state.isAuthenticated = true;
                 }
@@ -59,7 +59,7 @@ export const authSlice = createSlice({
     },
 });
 
-export const {setUser, clearUser} = authSlice.actions;
+export const { setUser, clearUser } = authSlice.actions;
 
 // Selectors
 export const selectCurrentUser = (state: RootState) => state.auth.user;

@@ -1,7 +1,7 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import "./globals.css";
-import {ConditionalLayout} from "@/components/conditional-layout";
-import {StoreProvider} from "@/store/StoreProvider";
+import { ConditionalLayout } from "@/components/conditional-layout";
+import { StoreProvider } from "@/store/StoreProvider";
 import localFont from "next/font/local";
 
 const geistSans = localFont({
@@ -22,21 +22,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF]`}
-        >
-        <StoreProvider>
-            <ConditionalLayout>
-                {children}
-            </ConditionalLayout>
-        </StoreProvider>
-        </body>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF]`}
+            >
+                <StoreProvider>
+                    <ConditionalLayout>
+                        {children}
+                    </ConditionalLayout>
+                </StoreProvider>
+            </body>
         </html>
     );
 }
