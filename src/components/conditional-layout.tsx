@@ -8,9 +8,10 @@ export function ConditionalLayout({children}: { children: React.ReactNode }) {
     const pathname = usePathname()
     const isHomePage = pathname === "/"
     const isAuthPage = pathname === "/auth" || pathname.startsWith("/auth?") || pathname === "/login" || pathname === "/signup"
+    const isResetPasswordPage = pathname === "/reset-password" || pathname.startsWith("/reset-password?")
 
-    if (isHomePage || isAuthPage) {
-        return <>{children}</>
+    if (isHomePage || isAuthPage || isResetPasswordPage) {
+            return <>{children}</>
     }
 
 

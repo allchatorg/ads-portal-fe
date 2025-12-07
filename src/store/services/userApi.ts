@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 
 // Role enum matching backend
 export enum Role {
@@ -28,6 +28,22 @@ export interface RegisterRequest {
     password: string;
 }
 
+// Forgot password request
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+// Reset password request
+export interface ResetPasswordRequest {
+    newPassword: string;
+    token: string;
+}
+
+// Generic message response
+export interface MessageResponse {
+    message: string;
+}
+
 // Auth response type matching backend AuthResponseDto
 export interface AuthResponse {
     id: number;
@@ -51,8 +67,17 @@ export const userApi = createApi({
     reducerPath: 'userApi',
     baseQuery: fetchBaseQuery({
         baseUrl: '/api',
-        // Session cookies are automatically included with credentials: 'include'
-        credentials: 'include',
+        prepareHeaders: (headers, {getState}) => {
+            // Get the token from the store
+            const token = (getState() as any).auth.token;
+
+            // If we have a token, set the Authorization header
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+
+            return headers;
+        },
     }),
     tagTypes: ['User', 'Auth'],
     endpoints: (builder) => ({
@@ -85,6 +110,24 @@ export const userApi = createApi({
             invalidatesTags: ['Auth', 'User'],
         }),
 
+        // Forgot password
+        forgotPassword: builder.mutation<MessageResponse, ForgotPasswordRequest>({
+            query: (data) => ({
+                url: '/auth/forgot-password',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // Reset password
+        resetPassword: builder.mutation<MessageResponse, ResetPasswordRequest>({
+            query: (data) => ({
+                url: '/auth/reset-password',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
         // Get current user
         getCurrentUser: builder.query<User, void>({
             query: () => '/user/me',
@@ -94,7 +137,7 @@ export const userApi = createApi({
         // Get user by ID
         getUserById: builder.query<User, string>({
             query: (id) => `/users/${id}`,
-            providesTags: (result, error, id) => [{ type: 'User', id }],
+            providesTags: (result, error, id) => [{type: 'User', id}],
         }),
 
         // Get all users (admin only)
@@ -103,20 +146,20 @@ export const userApi = createApi({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.map(({ id }) => ({ type: 'User' as const, id: id.toString() })),
-                        { type: 'User', id: 'LIST' },
+                        ...result.map(({id}) => ({type: 'User' as const, id: id.toString()})),
+                        {type: 'User', id: 'LIST'},
                     ]
-                    : [{ type: 'User', id: 'LIST' }],
+                    : [{type: 'User', id: 'LIST'}],
         }),
 
         // Update user
         updateUser: builder.mutation<User, Partial<User> & { id: number }>({
-            query: ({ id, ...patch }) => ({
+            query: ({id, ...patch}) => ({
                 url: `/users/${id}`,
                 method: 'PATCH',
                 body: patch,
             }),
-            invalidatesTags: (result, error, { id }) => [{ type: 'User', id: id.toString() }],
+            invalidatesTags: (result, error, {id}) => [{type: 'User', id: id.toString()}],
         }),
 
         // Delete user
@@ -125,7 +168,7 @@ export const userApi = createApi({
                 url: `/users/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id) => [{ type: 'User', id: id.toString() }],
+            invalidatesTags: (result, error, id) => [{type: 'User', id: id.toString()}],
         }),
     }),
 });
@@ -136,6 +179,8 @@ export const {
     useLoginMutation,
     useRegisterMutation,
     useLogoutMutation,
+    useForgotPasswordMutation,
+    useResetPasswordMutation,
     useGetCurrentUserQuery,
     useGetUserByIdQuery,
     useGetUsersQuery,

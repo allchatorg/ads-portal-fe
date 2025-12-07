@@ -1,16 +1,17 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useLoginMutation } from "@/store/services/userApi";
-import { useAppDispatch } from "@/store/hooks";
-import { setUser } from "@/store/slices/authSlice";
+import {useState} from "react";
+import {useForm} from "react-hook-form";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {AlertTriangle, CheckCircle2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {useForgotPasswordMutation, useLoginMutation} from "@/store/services/userApi";
+import {useAppDispatch} from "@/store/hooks";
+import {setUser} from "@/store/slices/authSlice";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -23,20 +24,24 @@ interface LoginRequest {
 }
 
 export function LoginForm({
-    className,
-    onAuthViewChange,
-    ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
+                              className,
+                              onAuthViewChange,
+                              ...props
+                          }: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [login, { isLoading, error: apiError }] = useLoginMutation();
+    const [login, {isLoading, error: apiError}] = useLoginMutation();
+    const [forgotPassword, {isLoading: isForgotPasswordLoading}] = useForgotPasswordMutation();
+    const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+    const [forgotPasswordError, setForgotPasswordError] = useState("");
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        getValues,
+        formState: {errors},
     } = useForm<LoginRequest>();
 
     const onSubmit = async (data: LoginRequest) => {
@@ -45,14 +50,17 @@ export function LoginForm({
 
             // Store user in Redux state
             dispatch(setUser({
-                id: response.id,
-                firstName: response.firstName,
-                lastName: response.lastName,
-                email: response.email,
-                role: response.role,
+                user: {
+                    id: response.id,
+                    firstName: response.firstName,
+                    lastName: response.lastName,
+                    email: response.email,
+                    role: response.role,
+                },
+                token: response.accessToken,
             }));
 
-            // Login successful - session cookie is automatically set by the browser
+            // Login successful
             console.log("Login successful:", response.message);
 
             // Redirect to ads page
@@ -65,8 +73,24 @@ export function LoginForm({
 
     const handleForgotPassword = async (e: React.MouseEvent) => {
         e.preventDefault();
-        // TODO: Implement forgot password logic
-        alert("Forgot password functionality - to be implemented");
+        setForgotPasswordError("");
+        setForgotPasswordSuccess(false);
+
+        try {
+            const email = getValues("email");
+            if (!email) {
+                setForgotPasswordError("Please enter your email address first.");
+                return;
+            }
+
+            await forgotPassword({email}).unwrap();
+            setForgotPasswordSuccess(true);
+        } catch (err: any) {
+            console.error("Forgot password failed:", err);
+            setForgotPasswordError(
+                err?.data?.message || "Failed to send reset email. Please check your email address."
+            );
+        }
     };
 
     return (
@@ -124,9 +148,27 @@ export function LoginForm({
                             )}
                         </div>
 
+                        {forgotPasswordSuccess && (
+                            <Alert className="border-green-200 bg-green-50">
+                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
+                                <AlertDescription className="m-0 p-0 text-green-800">
+                                    Password reset instructions have been sent to your email address.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {forgotPasswordError && (
+                            <Alert variant="destructive">
+                                <AlertTriangle className="h-4 w-4"/>
+                                <AlertDescription className="m-0 p-0">
+                                    {forgotPasswordError}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4"/>
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)

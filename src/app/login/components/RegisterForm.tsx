@@ -1,17 +1,17 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRegisterMutation } from "@/store/services/userApi";
-import { useAppDispatch } from "@/store/hooks";
-import { setUser } from "@/store/slices/authSlice";
+import {useForm} from "react-hook-form";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {useState} from "react";
+import {AlertTriangle, CheckCircle2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {useRegisterMutation} from "@/store/services/userApi";
+import {useAppDispatch} from "@/store/hooks";
+import {setUser} from "@/store/slices/authSlice";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -27,22 +27,22 @@ interface RegisterFormData {
 }
 
 export function RegisterForm({
-    className,
-    onAuthViewChange,
-    ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
+                                 className,
+                                 onAuthViewChange,
+                                 ...props
+                             }: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const [success, setSuccess] = useState<string | null>(null);
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [registerUser, { isLoading, error: apiError }] = useRegisterMutation();
+    const [registerUser, {isLoading, error: apiError}] = useRegisterMutation();
 
     const {
         register: formRegister,
         handleSubmit,
         watch,
-        formState: { errors },
+        formState: {errors},
         reset,
     } = useForm<RegisterFormData>({
         defaultValues: {
@@ -61,20 +61,23 @@ export function RegisterForm({
 
         try {
             // Remove confirmPassword before sending to API
-            const { confirmPassword, ...registerData } = data;
+            const {confirmPassword, ...registerData} = data;
 
             const response = await registerUser(registerData).unwrap();
 
             // Store user in Redux state
             dispatch(setUser({
-                id: response.id,
-                firstName: response.firstName,
-                lastName: response.lastName,
-                email: response.email,
-                role: response.role,
+                user: {
+                    id: response.id,
+                    firstName: response.firstName,
+                    lastName: response.lastName,
+                    email: response.email,
+                    role: response.role,
+                },
+                token: response.accessToken,
             }));
 
-            // Registration successful - session cookie is automatically set
+            // Registration successful
             console.log("Registration successful:", response.message);
             setSuccess("Registration successful! Redirecting...");
             reset();
@@ -151,7 +154,7 @@ export function RegisterForm({
                                 type="password"
                                 {...formRegister("password", {
                                     required: "Password is required",
-                                    minLength: { value: 8, message: "Password must be at least 8 characters" },
+                                    minLength: {value: 8, message: "Password must be at least 8 characters"},
                                     pattern: {
                                         value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\s]).{8,}$/,
                                         message:
@@ -182,7 +185,7 @@ export function RegisterForm({
 
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4"/>
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)
@@ -193,7 +196,7 @@ export function RegisterForm({
 
                         {success && (
                             <Alert className="border-green-500 bg-green-50 text-green-900">
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
                                 <AlertDescription className="m-0 p-0 text-green-900">
                                     {success}
                                 </AlertDescription>
