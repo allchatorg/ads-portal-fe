@@ -2,6 +2,7 @@
 
 import {useEffect} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
+import {AuthRoute} from "@/components/route-guards";
 
 // Legacy route: redirect /login to /auth preserving the view query if present
 export default function LegacyLoginRedirect() {
@@ -13,5 +14,10 @@ export default function LegacyLoginRedirect() {
         router.replace(`/auth?view=${view}`);
     }, [router, searchParams]);
 
-    return null;
+    return (
+        <AuthRoute>
+            {null}
+        </AuthRoute>
+    );
 }
+

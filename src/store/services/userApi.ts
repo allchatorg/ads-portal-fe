@@ -12,6 +12,9 @@ export interface User {
     firstName: string;
     lastName: string;
     email: string;
+    emailVerified: boolean;
+    phoneNumber?: string;
+    marketingEmails: boolean;
     role: Role;
 }
 
@@ -42,6 +45,11 @@ export interface ResetPasswordRequest {
 // Generic message response
 export interface MessageResponse {
     message: string;
+}
+
+// Verify email request
+export interface VerifyEmailRequest {
+    token: string;
 }
 
 // Auth response type matching backend AuthResponseDto
@@ -130,7 +138,7 @@ export const userApi = createApi({
 
         // Get current user
         getCurrentUser: builder.query<User, void>({
-            query: () => '/user/me',
+            query: () => '/auth/me',
             providesTags: ['User'],
         }),
 
@@ -170,6 +178,24 @@ export const userApi = createApi({
             }),
             invalidatesTags: (result, error, id) => [{type: 'User', id: id.toString()}],
         }),
+
+        // Send verification email
+        sendVerificationEmail: builder.mutation<MessageResponse, void>({
+            query: () => ({
+                url: '/auth/send-verification',
+                method: 'POST',
+            }),
+        }),
+
+        // Verify email with token
+        verifyEmail: builder.mutation<MessageResponse, VerifyEmailRequest>({
+            query: (data) => ({
+                url: '/auth/verify-email',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['User'],
+        }),
     }),
 });
 
@@ -186,4 +212,6 @@ export const {
     useGetUsersQuery,
     useUpdateUserMutation,
     useDeleteUserMutation,
+    useSendVerificationEmailMutation,
+    useVerifyEmailMutation,
 } = userApi;

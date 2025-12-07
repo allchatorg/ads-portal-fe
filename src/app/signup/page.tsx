@@ -2,6 +2,7 @@
 
 import {useEffect} from "react";
 import {useRouter} from "next/navigation";
+import {AuthRoute} from "@/components/route-guards";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -10,5 +11,10 @@ export default function SignupPage() {
         router.push("/auth?view=register");
     }, [router]);
 
-    return null;
+    return (
+        <AuthRoute>
+            {null}
+        </AuthRoute>
+    );
 }
+

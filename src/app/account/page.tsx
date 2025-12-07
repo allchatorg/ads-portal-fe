@@ -10,32 +10,49 @@ import {PhoneSettings} from './components/phone-settings'
 import {EmailSettings} from './components/email-settings'
 import {toast} from 'sonner'
 import {SiteHeader} from '@/components/site-header'
+import {
+    useGetCurrentUserQuery,
+    useSendVerificationEmailMutation,
+    useVerifyEmailMutation
+} from '@/store/services/userApi'
 
 export default function AccountSettingsPage() {
     const {user} = useUser()
     const [loading, setLoading] = useState(false)
+    const [verificationError, setVerificationError] = useState<string | undefined>()
 
-    // Mock user data for the account settings
-    const accountUser = {
-        email: user?.email || 'user@example.com',
-        verified: true, // Change to false to see unverified state
-        phoneNumber: '+1 (555) 123-4567', // Set to null to test add phone flow
-        phoneVerified: true,
-        emailNotifications: true,
-        marketingEmails: false,
+    // Fetch current user data from API
+    const {data: currentUser, isLoading: isLoadingUser} = useGetCurrentUserQuery()
+
+    // Email verification mutations
+    const [sendVerificationEmail, {isLoading: isSendingVerification}] = useSendVerificationEmailMutation()
+    const [verifyEmail] = useVerifyEmailMutation()
+
+    // Email verification handlers
+    const handleVerifyEmail = async (token: string) => {
+        try {
+            setVerificationError(undefined)
+            await verifyEmail({token}).unwrap()
+            toast.success('Email verified successfully!')
+        } catch (error: any) {
+            console.error('Email verification error:', error)
+            const errorMessage = error?.data?.message || 'Failed to verify email. Please check your code and try again.'
+            setVerificationError(errorMessage)
+            toast.error(errorMessage)
+        }
     }
 
-    // Boilerplate handlers
-    const handleVerifyEmail = (token: string) => {
-        console.log('Verifying email with token:', token)
-        toast.success('Email verified successfully!')
-        // TODO: Implement actual email verification logic
-    }
-
-    const handleResendEmailVerification = () => {
-        console.log('Resending email verification')
-        toast.success('Verification email sent!')
-        // TODO: Implement actual resend logic
+    const handleResendEmailVerification = async () => {
+        try {
+            setVerificationError(undefined)
+            await sendVerificationEmail().unwrap()
+            toast.success('Verification email sent!')
+        } catch (error: any) {
+            console.error('Send verification error:', error)
+            const errorMessage = error?.data?.message || 'Failed to send verification email. Please try again.'
+            setVerificationError(errorMessage)
+            toast.error(errorMessage)
+        }
     }
 
     const handleChangePassword = async (currentPassword: string, newPassword: string) => {
@@ -79,6 +96,20 @@ export default function AccountSettingsPage() {
         // TODO: Implement actual marketing preferences update
     }
 
+    if (isLoadingUser) {
+        return (
+            <div className="w-full">
+                <SiteHeader
+                    title="Account Settings"
+                    description="Manage your account security and preferences."
+                />
+                <div className="max-w-4xl mx-auto px-4 lg:px-6 py-4 md:gap-6 md:py-6">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="w-full">
             <SiteHeader
@@ -91,10 +122,12 @@ export default function AccountSettingsPage() {
 
                 {/* Email Verification */}
                 <EmailVerification
-                    verified={accountUser.verified}
-                    email={accountUser.email}
+                    verified={currentUser?.emailVerified ?? false}
+                    email={currentUser?.email ?? user?.email}
                     onVerify={handleVerifyEmail}
                     onResend={handleResendEmailVerification}
+                    error={verificationError}
+                    sending={isSendingVerification}
                 />
 
                 <Separator/>
@@ -106,9 +139,9 @@ export default function AccountSettingsPage() {
 
                 {/* Email Settings */}
                 <EmailSettings
-                    email={accountUser.email}
-                    emailNotifications={accountUser.emailNotifications}
-                    marketingEmails={accountUser.marketingEmails}
+                    email={currentUser?.email ?? user?.email}
+                    emailNotifications={true}
+                    marketingEmails={currentUser?.marketingEmails ?? false}
                     onUpdateNotifications={handleUpdateNotifications}
                     onUpdateMarketing={handleUpdateMarketing}
                 />
@@ -118,8 +151,8 @@ export default function AccountSettingsPage() {
                         <Separator/>
                         <PhoneSettings
                             user={{
-                                phoneNumber: accountUser.phoneNumber,
-                                phoneVerified: accountUser.phoneVerified,
+                                phoneNumber: currentUser?.phoneNumber ?? null,
+                                phoneVerified: false,
                             }}
                             onAddPhone={handleAddPhone}
                             onVerifyCode={handleVerifyPhone}
