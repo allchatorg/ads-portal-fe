@@ -11,6 +11,7 @@ import {EmailSettings} from './components/email-settings'
 import {toast} from 'sonner'
 import {SiteHeader} from '@/components/site-header'
 import {
+    useChangePasswordMutation,
     useGetCurrentUserQuery,
     useSendVerificationEmailMutation,
     useVerifyEmailMutation
@@ -18,7 +19,6 @@ import {
 
 export default function AccountSettingsPage() {
     const {user} = useUser()
-    const [loading, setLoading] = useState(false)
     const [verificationError, setVerificationError] = useState<string | undefined>()
 
     // Fetch current user data from API
@@ -27,6 +27,9 @@ export default function AccountSettingsPage() {
     // Email verification mutations
     const [sendVerificationEmail, {isLoading: isSendingVerification}] = useSendVerificationEmailMutation()
     const [verifyEmail] = useVerifyEmailMutation()
+
+    // Change password mutation
+    const [changePassword, {isLoading: isChangingPassword}] = useChangePasswordMutation()
 
     // Email verification handlers
     const handleVerifyEmail = async (token: string) => {
@@ -56,14 +59,18 @@ export default function AccountSettingsPage() {
     }
 
     const handleChangePassword = async (currentPassword: string, newPassword: string) => {
-        setLoading(true)
-        console.log('Changing password')
-        // Simulate API call
-        setTimeout(() => {
-            setLoading(false)
+        try {
+            await changePassword({
+                currentPassword,
+                newPassword,
+                confirmPassword: newPassword
+            }).unwrap()
             toast.success('Password changed successfully!')
-            // TODO: Implement actual password change logic
-        }, 1000)
+        } catch (error: any) {
+            console.error('Change password error:', error)
+            const errorMessage = error?.data?.message || 'Failed to change password. Please try again.'
+            toast.error(errorMessage)
+        }
     }
 
     const handleAddPhone = (phoneNumber: string) => {
@@ -133,7 +140,7 @@ export default function AccountSettingsPage() {
                 <Separator/>
 
                 {/* Change Password */}
-                <ChangePassword onChangePassword={handleChangePassword} loading={loading}/>
+                <ChangePassword onChangePassword={handleChangePassword} loading={isChangingPassword}/>
 
                 <Separator/>
 

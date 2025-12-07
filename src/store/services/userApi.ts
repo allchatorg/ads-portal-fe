@@ -52,6 +52,13 @@ export interface VerifyEmailRequest {
     token: string;
 }
 
+// Change password request
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
 // Auth response type matching backend AuthResponseDto
 export interface AuthResponse {
     id: number;
@@ -196,6 +203,15 @@ export const userApi = createApi({
             }),
             invalidatesTags: ['User'],
         }),
+
+        // Change password
+        changePassword: builder.mutation<MessageResponse, ChangePasswordRequest>({
+            query: (data) => ({
+                url: '/auth/change-password',
+                method: 'POST',
+                body: data,
+            }),
+        }),
     }),
 });
 
@@ -214,4 +230,5 @@ export const {
     useDeleteUserMutation,
     useSendVerificationEmailMutation,
     useVerifyEmailMutation,
+    useChangePasswordMutation,
 } = userApi;
