@@ -4,6 +4,7 @@ export interface User {
     name: string;
     role: "user" | "admin";
     totalPurchasedAds: number;
+    subscribedToMarketingEmails: boolean;
     totalSpent: number;
     createdAt: string;
 }

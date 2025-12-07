@@ -8,6 +8,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 5,
         totalSpent: 1250.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-01-15T10:00:00Z"
     },
     {
@@ -17,6 +18,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 12,
         totalSpent: 3400.50,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-02-20T14:30:00Z"
     },
     {
@@ -26,6 +28,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 2,
         totalSpent: 150.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-03-10T09:15:00Z"
     },
     {
@@ -35,6 +38,7 @@ export const MOCK_USERS: User[] = [
         role: "admin",
         totalPurchasedAds: 0,
         totalSpent: 0.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2022-11-05T16:45:00Z"
     },
     {
@@ -44,6 +48,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 8,
         totalSpent: 1800.75,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-04-01T11:20:00Z"
     },
     {
@@ -53,6 +58,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 15,
         totalSpent: 4500.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-05-12T13:10:00Z"
     },
     {
@@ -62,6 +68,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 1,
         totalSpent: 50.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-06-25T15:50:00Z"
     },
     {
@@ -71,6 +78,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 6,
         totalSpent: 1100.25,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-07-08T10:05:00Z"
     },
     {
@@ -80,6 +88,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 3,
         totalSpent: 450.50,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-08-14T12:40:00Z"
     },
     {
@@ -89,6 +98,7 @@ export const MOCK_USERS: User[] = [
         role: "user",
         totalPurchasedAds: 9,
         totalSpent: 2100.00,
+        subscribedToMarketingEmails: false,
         createdAt: "2023-09-30T14:55:00Z"
     }
 ];

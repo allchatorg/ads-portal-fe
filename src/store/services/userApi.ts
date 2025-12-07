@@ -14,7 +14,7 @@ export interface User {
     email: string;
     emailVerified: boolean;
     phoneNumber?: string;
-    marketingEmails: boolean;
+    subscribedToMarketingEmails: boolean;
     role: Role;
 }
 
@@ -59,6 +59,28 @@ export interface ChangePasswordRequest {
     confirmPassword: string;
 }
 
+// Request email update
+export interface RequestEmailUpdateRequest {
+    currentPassword: string;
+    newEmail: string;
+}
+
+// Verify email update
+export interface VerifyEmailUpdateRequest {
+    verificationCode: string; // 6 digits
+}
+
+// Email update verification response
+export interface EmailUpdateResponse {
+    message: string;
+    newEmail: string;
+}
+
+// Update marketing preferences request
+export interface UpdateMarketingPreferencesRequest {
+    subscribedToMarketingEmails: boolean;
+}
+
 // Auth response type matching backend AuthResponseDto
 export interface AuthResponse {
     id: number;
@@ -84,7 +106,7 @@ export const userApi = createApi({
         baseUrl: '/api',
         prepareHeaders: (headers, {getState}) => {
             // Get the token from the store
-            const token = (getState() as any).auth.token;
+            const token = (getState() as { auth: { token: string | null } }).auth.token;
 
             // If we have a token, set the Authorization header
             if (token) {
@@ -212,6 +234,35 @@ export const userApi = createApi({
                 body: data,
             }),
         }),
+
+        // Request email update
+        requestEmailUpdate: builder.mutation<MessageResponse, RequestEmailUpdateRequest>({
+            query: (data) => ({
+                url: '/auth/request-email-update',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // Verify email update
+        verifyEmailUpdate: builder.mutation<EmailUpdateResponse, VerifyEmailUpdateRequest>({
+            query: (data) => ({
+                url: '/auth/verify-email-update',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['User'],
+        }),
+
+        // Update marketing preferences
+        updateMarketingPreferences: builder.mutation<MessageResponse, UpdateMarketingPreferencesRequest>({
+            query: (data) => ({
+                url: '/auth/marketing-preferences',
+                method: 'PATCH',
+                body: {subscribedToMarketingEmails: data.subscribedToMarketingEmails},
+            }),
+            invalidatesTags: ['User'],
+        }),
     }),
 });
 
@@ -231,4 +282,7 @@ export const {
     useSendVerificationEmailMutation,
     useVerifyEmailMutation,
     useChangePasswordMutation,
+    useRequestEmailUpdateMutation,
+    useVerifyEmailUpdateMutation,
+    useUpdateMarketingPreferencesMutation,
 } = userApi;

@@ -8,12 +8,14 @@ import {EmailVerification} from './components/email-verification'
 import {ChangePassword} from './components/change-password'
 import {PhoneSettings} from './components/phone-settings'
 import {EmailSettings} from './components/email-settings'
+import {UpdateEmail} from './components/update-email'
 import {toast} from 'sonner'
 import {SiteHeader} from '@/components/site-header'
 import {
     useChangePasswordMutation,
     useGetCurrentUserQuery,
     useSendVerificationEmailMutation,
+    useUpdateMarketingPreferencesMutation,
     useVerifyEmailMutation
 } from '@/store/services/userApi'
 
@@ -30,6 +32,9 @@ export default function AccountSettingsPage() {
 
     // Change password mutation
     const [changePassword, {isLoading: isChangingPassword}] = useChangePasswordMutation()
+
+    // Marketing preferences mutation
+    const [updateMarketingPreferences] = useUpdateMarketingPreferencesMutation()
 
     // Email verification handlers
     const handleVerifyEmail = async (token: string) => {
@@ -91,16 +96,15 @@ export default function AccountSettingsPage() {
         // TODO: Implement actual phone update logic
     }
 
-    const handleUpdateNotifications = (notifications: boolean) => {
-        console.log('Email notifications:', notifications)
-        toast.success('Notification preferences updated!')
-        // TODO: Implement actual notification preferences update
-    }
-
-    const handleUpdateMarketing = (marketing: boolean) => {
-        console.log('Marketing emails:', marketing)
-        toast.success('Marketing preferences updated!')
-        // TODO: Implement actual marketing preferences update
+    const handleUpdateMarketing = async (marketing: boolean) => {
+        try {
+            await updateMarketingPreferences({subscribedToMarketingEmails: marketing}).unwrap()
+            toast.success('Marketing preferences updated!')
+        } catch (error: any) {
+            console.error('Update marketing preferences error:', error)
+            const errorMessage = error?.data?.message || 'Failed to update marketing preferences. Please try again.'
+            toast.error(errorMessage)
+        }
     }
 
     if (isLoadingUser) {
@@ -144,12 +148,14 @@ export default function AccountSettingsPage() {
 
                 <Separator/>
 
+                {/* Update Email */}
+                <UpdateEmail currentEmail={currentUser?.email ?? user?.email}/>
+
+                <Separator/>
+
                 {/* Email Settings */}
                 <EmailSettings
-                    email={currentUser?.email ?? user?.email}
-                    emailNotifications={true}
-                    marketingEmails={currentUser?.marketingEmails ?? false}
-                    onUpdateNotifications={handleUpdateNotifications}
+                    subscribedToMarketingEmails={currentUser?.subscribedToMarketingEmails ?? false}
                     onUpdateMarketing={handleUpdateMarketing}
                 />
 
