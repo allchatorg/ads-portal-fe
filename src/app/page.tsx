@@ -2,8 +2,9 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import {ArrowRight, BarChart3, Image as ImageIcon, MessageSquare, Users, Video} from "lucide-react"
+import {ArrowRight, BarChart3, FileText, Image as ImageIcon, MessageSquare, Users, Video} from "lucide-react"
 import {motion, Variants} from "framer-motion"
+import {AD_FORMAT_MOCK_DATA, AdFormatType} from "@/data/adFormats";
 
 const containerVariants: Variants = {
     hidden: {opacity: 0},
@@ -125,41 +126,36 @@ export default function Home() {
                         </div>
 
                         <div className="grid w-full gap-6 sm:grid-cols-3">
-                            {[
-                                {
-                                    icon: MessageSquare,
-                                    title: "Text Ads",
-                                    desc: "Native chat bubbles that blend into the conversation.",
-                                    delay: 0
-                                },
-                                {
-                                    icon: ImageIcon,
-                                    title: "Image Ads",
-                                    desc: "Visual cards designed to stop the scroll and drive clicks.",
-                                    delay: 0.1
-                                },
-                                {
-                                    icon: Video,
-                                    title: "Video Ads",
-                                    desc: "Immersive storytelling that autoplays in the feed.",
-                                    delay: 0.2
-                                },
-                            ].map((card, index) => {
-                                const Icon = card.icon
+                            {AD_FORMAT_MOCK_DATA.map((format) => {
+                                let Icon = FileText;
+                                switch (format.type) {
+                                    case AdFormatType.TEXT:
+                                        Icon = MessageSquare;
+                                        break;
+                                    case AdFormatType.PHOTO:
+                                        Icon = ImageIcon;
+                                        break;
+                                    case AdFormatType.VIDEO:
+                                        Icon = Video;
+                                        break;
+                                }
+
                                 return (
-                                    <motion.div
-                                        key={card.title}
-                                        variants={itemVariants}
-                                        whileHover={{y: -5, transition: {duration: 0.2}}}
-                                        className="group relative rounded-2xl bg-white/80 backdrop-blur-md p-8 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all border border-white/50"
-                                    >
-                                        <div
-                                            className="mb-4 inline-flex items-center justify-center rounded-xl bg-[#E0EEFF] p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                                            <Icon className="h-6 w-6"/>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-2">{card.title}</h3>
-                                        <p className="text-slate-600 leading-relaxed">{card.desc}</p>
-                                    </motion.div>
+                                    <Link key={format.id} href={`/campaign?formatId=${format.id}`}
+                                          className="block h-full">
+                                        <motion.div
+                                            variants={itemVariants}
+                                            whileHover={{y: -5, transition: {duration: 0.2}}}
+                                            className="group relative h-full rounded-2xl bg-white/80 backdrop-blur-md p-8 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all border border-white/50 flex flex-col items-start"
+                                        >
+                                            <div
+                                                className="mb-4 inline-flex items-center justify-center rounded-xl bg-[#E0EEFF] p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                                                <Icon className="h-6 w-6"/>
+                                            </div>
+                                            <h3 className="text-xl font-bold text-slate-900 mb-2">{format.title}</h3>
+                                            <p className="text-slate-600 leading-relaxed max-w-sm">{format.description}</p>
+                                        </motion.div>
+                                    </Link>
                                 )
                             })}
                         </div>

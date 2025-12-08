@@ -1,36 +1,35 @@
 'use client'
 'use client'
-import { useState } from "react";
-import { CheckCircle2, ChevronLeft, ChevronRight, ImageIcon, MousePointerClick, Play, Type } from "lucide-react";
-import { AdOption } from "@/models/AdOption";
-import { AdType } from "@/models/adType";
-import { AdCard } from "@/app/campaign/components/ad-card";
+import {useState} from "react";
+import {CheckCircle2, ChevronLeft, ChevronRight, MousePointerClick} from "lucide-react";
+import {AdCard} from "@/app/campaign/components/ad-card";
+import {AdFormatDto} from "@/data/adFormats";
 
 
 interface AdCampaignSelectorProps {
-    selectedAd: AdType;
-    onSelect: (type: AdType) => void;
+    selectedFormat: AdFormatDto;
+    onSelect: (format: AdFormatDto) => void;
     onNext: () => void;
-    adOptions: AdOption[];
+    adFormats: AdFormatDto[];
 }
 
 export default function AdCampaignSelector({
-    selectedAd,
-    onSelect,
-    onNext,
-    adOptions
-}: AdCampaignSelectorProps) {
+                                               selectedFormat,
+                                               onSelect,
+                                               onNext,
+                                               adFormats
+                                           }: AdCampaignSelectorProps) {
 
     // We keep carousel index local as it's purely UI/View state
     const [currentMobileIndex, setCurrentMobileIndex] = useState(1);
 
     // Mobile Carousel Logic
     const nextSlide = () => {
-        setCurrentMobileIndex((prev) => (prev === adOptions.length - 1 ? 0 : prev + 1));
+        setCurrentMobileIndex((prev) => (prev === adFormats.length - 1 ? 0 : prev + 1));
     };
 
     const prevSlide = () => {
-        setCurrentMobileIndex((prev) => (prev === 0 ? adOptions.length - 1 : prev - 1));
+        setCurrentMobileIndex((prev) => (prev === 0 ? adFormats.length - 1 : prev - 1));
     };
 
     return (
@@ -49,12 +48,12 @@ export default function AdCampaignSelector({
 
                 {/* --- DESKTOP VIEW (Grid) --- */}
                 <div className="hidden md:grid md:grid-cols-3 gap-6">
-                    {adOptions.map((option) => (
-                        <div key={option.id} className="h-full">
+                    {adFormats.map((format) => (
+                        <div key={format.id} className="h-full">
                             <AdCard
-                                option={option}
-                                isSelected={selectedAd === option.id}
-                                onSelect={onSelect} // Uses prop function
+                                format={format}
+                                isSelected={selectedFormat.id === format.id}
+                                onSelect={onSelect}
                             />
                         </div>
                     ))}
@@ -64,14 +63,14 @@ export default function AdCampaignSelector({
                 <div className="md:hidden relative w-full max-w-md mx-auto">
                     {/* Carousel Container */}
                     <div className="relative h-[480px] w-full perspective-1000">
-                        {adOptions.map((option, index) => {
+                        {adFormats.map((format, index) => {
                             if (index !== currentMobileIndex) return null;
                             return (
-                                <div key={option.id} className="animate-in fade-in zoom-in duration-300 h-full">
+                                <div key={format.id} className="animate-in fade-in zoom-in duration-300 h-full">
                                     <AdCard
-                                        option={option}
-                                        isSelected={selectedAd === option.id}
-                                        onSelect={onSelect} // Uses prop function
+                                        format={format}
+                                        isSelected={selectedFormat.id === format.id}
+                                        onSelect={onSelect}
                                         className="shadow-xl"
                                     />
                                 </div>
@@ -86,7 +85,7 @@ export default function AdCampaignSelector({
                             className="p-2 rounded-full bg-white border border-slate-200 shadow-md text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
                             aria-label="Previous Ad Type"
                         >
-                            <ChevronLeft size={24} />
+                            <ChevronLeft size={24}/>
                         </button>
                     </div>
 
@@ -96,13 +95,13 @@ export default function AdCampaignSelector({
                             className="p-2 rounded-full bg-white border border-slate-200 shadow-md text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
                             aria-label="Next Ad Type"
                         >
-                            <ChevronRight size={24} />
+                            <ChevronRight size={24}/>
                         </button>
                     </div>
 
                     {/* Carousel Indicators */}
                     <div className="flex justify-center mt-6 gap-2">
-                        {adOptions.map((_, idx) => (
+                        {adFormats.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setCurrentMobileIndex(idx)}
@@ -115,7 +114,7 @@ export default function AdCampaignSelector({
                     </div>
 
                     <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
-                        <MousePointerClick size={12} />
+                        <MousePointerClick size={12}/>
                         Tap card to select
                     </p>
                 </div>
@@ -125,12 +124,12 @@ export default function AdCampaignSelector({
                     className="mt-12 bg-white rounded-xl p-6 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="bg-indigo-100 p-2 rounded-lg">
-                            <CheckCircle2 className="text-indigo-600 w-5 h-5" />
+                            <CheckCircle2 className="text-indigo-600 w-5 h-5"/>
                         </div>
                         <div>
                             <p className="text-sm text-slate-500 font-medium">Selected Format</p>
                             <p className="text-lg font-bold text-slate-900 capitalize">
-                                {adOptions.find(o => o.id === selectedAd)?.title}
+                                {selectedFormat.title}
                             </p>
                         </div>
                     </div>

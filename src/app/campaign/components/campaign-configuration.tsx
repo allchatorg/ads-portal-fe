@@ -1,60 +1,55 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from "react";
-import { AdType } from "@/models/adType";
-import { CampaignDetails, ValidationErrors } from "@/hooks/use-campaign-creator";
-import { AdOption } from "@/models/AdOption";
-import { CheckCircle2, ChevronLeft, Info, Upload, X } from "lucide-react";
+import {useCallback, useEffect} from "react";
+import {CampaignDetails, ValidationErrors} from "@/hooks/use-campaign-creator";
+import {CheckCircle2, ChevronLeft, FileText, Image as ImageIcon, Info, Play, Upload, X} from "lucide-react";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { ActionButton } from "@/components/ui/action-button";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Button} from "@/components/ui/button";
+import {ActionButton} from "@/components/ui/action-button";
 import CostEstimationCard from "./cost-estimation-card";
-import { MAX_CHAR_COUNT } from "@/utils/pricing-utils";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
+import {AdFormatDto, AdFormatType} from "@/data/adFormats";
+import {MAX_CHAR_COUNT} from "@/utils/pricing-utils";
 
 interface CampaignConfigurationProps {
-    adType: AdType;
+    selectedFormat: AdFormatDto;
     details: CampaignDetails;
     setDetails: (value: React.SetStateAction<CampaignDetails>) => void;
     errors: ValidationErrors;
     onNext: () => void;
     onBack: () => void;
-    adOptions: AdOption[];
 }
 
 export default function CampaignConfiguration({
-    adType,
-    details,
-    setDetails,
-    onNext,
-    onBack,
-    adOptions
-}: CampaignConfigurationProps) {
+                                                  selectedFormat,
+                                                  details,
+                                                  setDetails,
+                                                  onNext,
+                                                  onBack
+                                              }: CampaignConfigurationProps) {
 
-    const currentOption = adOptions.find(o => o.id === adType);
-
-    // Dynamic schema based on adType
+    // Dynamic schema based on selectedFormat.type
     const schema = z.object({
         name: z.string().min(1, "Campaign name is required"),
-        text: adType === 'text'
+        text: selectedFormat.type === AdFormatType.TEXT
             ? z.string().min(1, "Ad text content is required").max(MAX_CHAR_COUNT, `Max ${MAX_CHAR_COUNT} characters`)
             : z.string().max(MAX_CHAR_COUNT, `Max ${MAX_CHAR_COUNT} characters`).optional(),
-        media: adType !== 'text'
+        media: selectedFormat.type !== AdFormatType.TEXT
             ? z.custom<File>((val) => val instanceof File, "Media is required").or(z.null())
             : z.any().optional(),
-        mediaUrl: adType !== 'text'
+        mediaUrl: selectedFormat.type !== AdFormatType.TEXT
             ? z.string().nullable()
             : z.string().nullable().optional(),
         views: z.number().min(100)
     }).refine((data) => {
-        if (adType !== 'text' && !data.media && !data.mediaUrl) {
+        if (selectedFormat.type !== AdFormatType.TEXT && !data.media && !data.mediaUrl) {
             return false;
         }
         return true;
@@ -91,9 +86,6 @@ export default function CampaignConfiguration({
         return () => subscription.unsubscribe();
     }, [form, form.watch, setDetails]);
 
-    // Re-trigger validation when adType changes
-    // Skip the first render to avoid showing errors immediately on mount
-
 
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, fieldChange: (file: File | null) => void) => {
         const file = e.target.files?.[0];
@@ -125,7 +117,20 @@ export default function CampaignConfiguration({
         onNext();
     };
 
-    if (!currentOption) return null;
+
+    const getIcon = () => {
+        switch (selectedFormat.type) {
+            case AdFormatType.TEXT:
+                return FileText;
+            case AdFormatType.PHOTO:
+                return ImageIcon;
+            case AdFormatType.VIDEO:
+                return Play;
+            default:
+                return FileText;
+        }
+    }
+    const Icon = getIcon();
 
     return (
         <div className="w-full max-w-4xl mx-auto">
@@ -133,11 +138,11 @@ export default function CampaignConfiguration({
                 <CardHeader className="border-b border-slate-200 px-8 py-6">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                            <currentOption.icon className="w-6 h-6 text-indigo-600" />
+                            <Icon className="w-6 h-6 text-indigo-600"/>
                         </div>
                         <div>
                             <CardTitle
-                                className="text-xl font-bold text-slate-900">Configure {currentOption.title}</CardTitle>
+                                className="text-xl font-bold text-slate-900">Configure {selectedFormat.title}</CardTitle>
                             <CardDescription className="text-slate-500 text-sm">Fill in the details for your
                                 campaign</CardDescription>
                         </div>
@@ -154,7 +159,7 @@ export default function CampaignConfiguration({
                                     <FormField
                                         control={form.control}
                                         name="name"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel className="text-sm font-semibold text-slate-700">Campaign
                                                     Name</FormLabel>
@@ -165,7 +170,7 @@ export default function CampaignConfiguration({
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -174,12 +179,12 @@ export default function CampaignConfiguration({
                                     <FormField
                                         control={form.control}
                                         name="text"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <div className="flex justify-between items-center">
                                                     <FormLabel className="text-sm font-semibold text-slate-700">
-                                                        Ad Text Content {adType !== 'text' &&
-                                                            <span className="text-slate-400 font-normal">(Optional)</span>}
+                                                        Ad Text Content {selectedFormat.type !== AdFormatType.TEXT &&
+                                                        <span className="text-slate-400 font-normal">(Optional)</span>}
                                                     </FormLabel>
                                                     <span
                                                         className={`text-xs ${field.value?.length && field.value.length >= MAX_CHAR_COUNT ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
@@ -195,20 +200,20 @@ export default function CampaignConfiguration({
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
 
                                     {/* Media Upload - Only for non-text ads */}
-                                    {adType !== 'text' && (
+                                    {selectedFormat.type !== AdFormatType.TEXT && (
                                         <FormField
                                             control={form.control}
                                             name="media"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-semibold text-slate-700">
-                                                        {adType === 'video' ? 'Video Asset' : 'Image Asset'}
+                                                        {selectedFormat.type === AdFormatType.VIDEO ? 'Video Asset' : 'Image Asset'}
                                                     </FormLabel>
                                                     <FormControl>
                                                         {!form.getValues('mediaUrl') ? (
@@ -219,20 +224,20 @@ export default function CampaignConfiguration({
                                                             >
                                                                 <input
                                                                     type="file"
-                                                                    accept={adType === 'video' ? "video/*" : "image/*"}
+                                                                    accept={selectedFormat.type === AdFormatType.VIDEO ? "video/*" : "image/*"}
                                                                     onChange={(e) => handleFileChange(e, field.onChange)}
                                                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                                 />
                                                                 <div className="flex flex-col items-center gap-3">
                                                                     <div
                                                                         className="p-4 bg-white rounded-full shadow-sm">
-                                                                        <Upload className="w-6 h-6 text-indigo-600" />
+                                                                        <Upload className="w-6 h-6 text-indigo-600"/>
                                                                     </div>
                                                                     <div>
                                                                         <p className="font-medium text-slate-900">Click
                                                                             to upload or drag and drop</p>
                                                                         <p className="text-xs text-slate-500 mt-1">
-                                                                            {adType === 'video' ? 'MP4, WebM up to 50MB' : 'PNG, JPG up to 10MB'}
+                                                                            {selectedFormat.type === AdFormatType.VIDEO ? 'MP4, WebM up to 50MB' : 'PNG, JPG up to 10MB'}
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -240,9 +245,9 @@ export default function CampaignConfiguration({
                                                         ) : (
                                                             <div
                                                                 className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-video flex items-center justify-center group">
-                                                                {adType === 'video' ? (
+                                                                {selectedFormat.type === AdFormatType.VIDEO ? (
                                                                     <video src={form.getValues('mediaUrl')!} controls
-                                                                        className="max-h-full max-w-full" />
+                                                                           className="max-h-full max-w-full"/>
                                                                 ) : (
                                                                     <Image
                                                                         src={form.getValues('mediaUrl')!}
@@ -256,12 +261,12 @@ export default function CampaignConfiguration({
                                                                     onClick={removeMedia}
                                                                     className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white text-red-600 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                                                                 >
-                                                                    <X size={16} />
+                                                                    <X size={16}/>
                                                                 </button>
                                                             </div>
                                                         )}
                                                     </FormControl>
-                                                    <FormMessage />
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
@@ -273,7 +278,7 @@ export default function CampaignConfiguration({
                                     <CostEstimationCard
                                         details={details}
                                         setDetails={setDetails}
-                                        currentOption={currentOption}
+                                        selectedFormat={selectedFormat}
                                     />
                                 </div>
                             </div>
@@ -286,7 +291,7 @@ export default function CampaignConfiguration({
                                 onClick={onBack}
                                 className="text-slate-600 hover:text-slate-900 hover:bg-slate-200"
                             >
-                                <ChevronLeft className="w-4 h-4 mr-2" />
+                                <ChevronLeft className="w-4 h-4 mr-2"/>
                                 Back
                             </Button>
                             <div className="flex items-center gap-4">
@@ -294,7 +299,7 @@ export default function CampaignConfiguration({
                                     <TooltipTrigger>
                                         <div
                                             className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors cursor-help">
-                                            <Info className="w-4 h-4" />
+                                            <Info className="w-4 h-4"/>
                                             <span className="text-xs">Approval Process</span>
                                         </div>
                                     </TooltipTrigger>

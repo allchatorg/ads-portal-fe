@@ -1,30 +1,30 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { AdOption } from "@/models/AdOption";
-import { CampaignDetails } from "@/hooks/use-campaign-creator";
-import { useMemo } from "react";
-import { calculateAdCost } from "@/utils/pricing-utils";
-import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {Card, CardContent} from "@/components/ui/card";
+import {Label} from "@/components/ui/label";
+import {Slider} from "@/components/ui/slider";
+import {AdFormatDto, AdFormatType} from "@/data/adFormats";
+import {CampaignDetails} from "@/hooks/use-campaign-creator";
+import {useMemo} from "react";
+import {calculateAdCost} from "@/utils/pricing-utils";
+import {Info} from "lucide-react";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 
 interface CostEstimationCardProps {
     details: CampaignDetails;
     setDetails: (value: React.SetStateAction<CampaignDetails>) => void;
-    currentOption: AdOption;
+    selectedFormat: AdFormatDto;
 }
 
 export default function CostEstimationCard({
-    details,
-    setDetails,
-    currentOption
-}: CostEstimationCardProps) {
+                                               details,
+                                               setDetails,
+                                               selectedFormat
+                                           }: CostEstimationCardProps) {
 
     const pricingData = useMemo(() => {
-        return calculateAdCost(currentOption.id, details.text.length, details.views);
-    }, [details.views, details.text.length, currentOption.id]);
+        return calculateAdCost(selectedFormat, details.text.length, details.views);
+    }, [details.views, details.text.length, selectedFormat]);
 
-    const { totalCost, baseCPM, textCPM, totalCPM } = pricingData;
+    const {totalCost, baseCPM, textCPM, totalCPM} = pricingData;
 
     return (
         <Card className="border-slate-200 shadow-sm h-full">
@@ -46,7 +46,7 @@ export default function CostEstimationCard({
                                 max={30000}
                                 min={1000}
                                 step={1000}
-                                onValueChange={(vals) => setDetails(prev => ({ ...prev, views: vals[0] }))}
+                                onValueChange={(vals) => setDetails(prev => ({...prev, views: vals[0]}))}
                                 className="py-2"
                             />
                             <div className="flex justify-between text-xs text-slate-400 font-medium">
@@ -56,30 +56,34 @@ export default function CostEstimationCard({
                         </div>
                     </div>
 
-                    <div className="h-px bg-slate-100" />
+                    <div className="h-px bg-slate-100"/>
 
                     {/* Cost Breakdown */}
                     <div className="space-y-3 text-sm">
-                        {currentOption.id !== 'text' && baseCPM > 0 && (
+                        {/* Show Base CPM if not a Text ad (or if strictly separate) */}
+                        {selectedFormat.type !== AdFormatType.TEXT && (
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-600">Base CPM ({currentOption.id})</span>
+                                <span className="text-slate-600">Base CPM</span>
                                 <span className="font-medium text-slate-900">${baseCPM.toFixed(2)}</span>
                             </div>
                         )}
-                        {textCPM > 0 && (
+
+                        {/* Show Text Tier Info if Text Ad */}
+                        {selectedFormat.type === AdFormatType.TEXT && (
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-1">
-                                    <span className="text-slate-600">Text CPM ({details.text.length} chars)</span>
+                                    <span className="text-slate-600">Tier Pricing ({details.text.length} chars)</span>
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <Info className="w-3 h-3 text-slate-400 hover:text-slate-600 cursor-help" />
+                                            <Info className="w-3 h-3 text-slate-400 hover:text-slate-600 cursor-help"/>
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <div className="text-xs space-y-1">
                                                 <p className="font-semibold">Text Pricing Tiers:</p>
-                                                <p>0-125 chars: $10 CPM</p>
-                                                <p>126-250 chars: $15 CPM</p>
-                                                <p>251-500 chars: $20 CPM</p>
+                                                {selectedFormat.pricingTiers?.map((tier, idx) => (
+                                                    <p key={idx}>Up to {tier.maxCharacters} chars:
+                                                        ${tier.pricePerMille} CPM</p>
+                                                ))}
                                             </div>
                                         </TooltipContent>
                                     </Tooltip>
@@ -87,13 +91,10 @@ export default function CostEstimationCard({
                                 <span className="font-medium text-slate-900">${textCPM.toFixed(2)}</span>
                             </div>
                         )}
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Total CPM</span>
+
+                        <div className="mt-2 pt-2 border-t border-slate-50 flex justify-between items-center">
+                            <span className="text-slate-600 font-medium">Total CPM</span>
                             <span className="font-medium text-slate-900">${totalCPM.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Total Views</span>
-                            <span className="font-medium text-slate-900">{details.views.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
@@ -111,3 +112,4 @@ export default function CostEstimationCard({
         </Card>
     );
 }
+

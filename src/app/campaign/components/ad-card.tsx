@@ -1,21 +1,43 @@
-import {CheckCircle2, Eye} from "lucide-react";
-import {AdType} from "@/models/adType";
-import {AdOption} from "@/models/AdOption";
+import {CheckCircle2, Eye, FileText, Image as ImageIcon, Play} from "lucide-react";
+import {AdFormatDto, AdFormatType} from "@/data/adFormats";
 
 interface AdCardProps {
-    option: AdOption;
+    format: AdFormatDto;
     isSelected: boolean;
-    onSelect: (id: AdType) => void;
+    onSelect: (format: AdFormatDto) => void;
     className?: string;
 }
 
+export const AdCard: React.FC<AdCardProps> = ({format, isSelected, onSelect, className = ''}) => {
 
-export const AdCard: React.FC<AdCardProps> = ({option, isSelected, onSelect, className = ''}) => {
-    const Icon = option.icon;
+    // Map icons based on type
+    const getIcon = () => {
+        switch (format.type) {
+            case AdFormatType.TEXT:
+                return FileText;
+            case AdFormatType.PHOTO:
+                return ImageIcon;
+            case AdFormatType.VIDEO:
+                return Play;
+            default:
+                return FileText;
+        }
+    }
+
+    const Icon = getIcon();
+
+    // Price display logic
+    const getPriceDisplay = () => {
+        if (format.pricingTiers && format.pricingTiers.length > 0) {
+            const minPrice = Math.min(...format.pricingTiers.map(t => t.pricePerMille));
+            return `From $${minPrice.toFixed(2)}`;
+        }
+        return `$${format.pricePerMille.toFixed(2)}`;
+    };
 
     return (
         <div
-            onClick={() => onSelect(option.id)}
+            onClick={() => onSelect(format)}
             className={`
         relative group flex flex-col h-full p-6 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none
         ${isSelected
@@ -34,13 +56,13 @@ export const AdCard: React.FC<AdCardProps> = ({option, isSelected, onSelect, cla
             </div>
 
             {/* Recommended Badge */}
-            {option.recommended && (
+            {format.recommended && (
                 <span className={`
           absolute -top-3 left-6 px-3 py-1 text-xs font-semibold tracking-wide uppercase rounded-full
           ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-white'}
         `}>
-          Most Popular
-        </span>
+                    Most Popular
+                </span>
             )}
 
             {/* Header / Icon */}
@@ -56,15 +78,15 @@ export const AdCard: React.FC<AdCardProps> = ({option, isSelected, onSelect, cla
             {/* Content */}
             <div className="flex-grow">
                 <h3 className={`text-lg font-bold mb-2 ${isSelected ? 'text-indigo-950' : 'text-slate-900'}`}>
-                    {option.title}
+                    {format.title}
                 </h3>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6">
-                    {option.description}
+                    {format.description}
                 </p>
 
                 {/* Mini feature list */}
                 <ul className="space-y-2 mb-6">
-                    {option.features.map((feature, idx) => (
+                    {format.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center text-xs text-slate-500">
                             <div
                                 className={`w-1.5 h-1.5 rounded-full mr-2 ${isSelected ? 'bg-indigo-400' : 'bg-slate-300'}`}/>
@@ -79,9 +101,9 @@ export const AdCard: React.FC<AdCardProps> = ({option, isSelected, onSelect, cla
                 <div>
                     <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">CPM Pricing</span>
                     <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-900'}`}>
-              ${option.pricePerMille.toFixed(2)}
-            </span>
+                        <span className={`text-2xl font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-900'}`}>
+                            {getPriceDisplay()}
+                        </span>
                         <span className="text-xs text-slate-400">/ 1k views</span>
                     </div>
                 </div>

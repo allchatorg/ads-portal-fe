@@ -1,9 +1,8 @@
 'use client';
-import { SiteHeader } from "@/components/site-header"
+import {SiteHeader} from "@/components/site-header"
 import AdCampaignSelector from "@/app/campaign/components/ad-campaign-selector";
-import { ClickableStepper } from "@/components/clickable-stepper";
-import { useCampaignCreator } from "@/hooks/use-campaign-creator";
-import { AD_OPTIONS } from "@/constants/ad-options";
+import {ClickableStepper} from "@/components/clickable-stepper";
+import {useCampaignCreator} from "@/hooks/use-campaign-creator";
 import CampaignConfiguration from "@/app/campaign/components/campaign-configuration";
 import StripePayment from "@/app/campaign/components/stripe-payment";
 
@@ -12,12 +11,12 @@ export default function Page() {
         currentStep,
         goToStep,
         nextStep,
-        adType,
-        setAdType,
+        selectedAdFormat,
+        setSelectedAdFormat,
         details,
         setDetails,
         errors,
-        adOptions,
+        adFormats,
         prevStep
     } = useCampaignCreator();
 
@@ -36,16 +35,17 @@ export default function Page() {
                 <ClickableStepper
                     steps={STEPS}
                     currentStep={currentStep}
-                    onStepChange={() => { }}
+                    onStepChange={() => {
+                    }}
                 />
 
                 {/* Step 0: Ad Type Selection */}
                 <div className="mt-6 w-full">
                     {currentStep === 0 && (
                         <AdCampaignSelector
-                            adOptions={AD_OPTIONS}
-                            selectedAd={adType}
-                            onSelect={setAdType}
+                            adFormats={adFormats}
+                            selectedFormat={selectedAdFormat}
+                            onSelect={setSelectedAdFormat}
                             onNext={nextStep}
                         />
                     )}
@@ -53,13 +53,12 @@ export default function Page() {
                     {/* Step 1: Configuration */}
                     {currentStep === 1 && (
                         <CampaignConfiguration
-                            adType={adType}
+                            selectedFormat={selectedAdFormat}
                             details={details}
                             setDetails={setDetails}
                             errors={errors}
                             onNext={nextStep}
                             onBack={prevStep}
-                            adOptions={adOptions}
                         />
                     )}
 
@@ -67,8 +66,7 @@ export default function Page() {
                         <div className="w-full max-w-md mx-auto">
                             <StripePayment
                                 details={details}
-                                adType={adType}
-                                adOption={adOptions.find(opt => opt.id === adType)!}
+                                selectedFormat={selectedAdFormat}
                                 onBack={prevStep}
                             />
                         </div>

@@ -1,40 +1,33 @@
 'use client';
 
 import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { ChevronLeft, Lock } from 'lucide-react';
-import { calculateAdCost } from '@/utils/pricing-utils';
-import { AdType } from '@/models/adType';
-import { ActionButton } from '@/components/ui/action-button';
+import {loadStripe} from '@stripe/stripe-js';
+import {CardElement, Elements, useElements, useStripe} from '@stripe/react-stripe-js';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
+import {Label} from '@/components/ui/label';
+import {Input} from '@/components/ui/input';
+import {ChevronLeft, Lock} from 'lucide-react';
+import {calculateAdCost} from '@/utils/pricing-utils';
+import {ActionButton} from '@/components/ui/action-button';
+import {AdFormatDto} from '@/data/adFormats';
+import {CampaignDetails} from '@/hooks/use-campaign-creator';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 interface StripePaymentProps {
-    details: {
-        name: string;
-        views: number;
-        text: string;
-    };
-    adType: AdType;
-    adOption: {
-        title: string;
-        pricePerMille: number;
-    };
+    details: CampaignDetails;
+    selectedFormat: AdFormatDto;
     onBack: () => void;
 }
 
-const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) => {
+const PaymentCard = ({details, selectedFormat, onBack}: StripePaymentProps) => {
     const stripe = useStripe();
     const elements = useElements();
 
-    const { totalCost } = calculateAdCost(adType, details.text.length, details.views);
+    const {totalCost} = calculateAdCost(selectedFormat, details.text.length, details.views);
 
     const handleSubmit = async () => {
         if (!stripe || !elements) {
@@ -44,7 +37,7 @@ const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) 
         const cardElement = elements.getElement(CardElement);
 
         if (cardElement) {
-            const { error, paymentMethod } = await stripe.createPaymentMethod({
+            const {error, paymentMethod} = await stripe.createPaymentMethod({
                 type: 'card',
                 card: cardElement,
             });
@@ -75,7 +68,7 @@ const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) 
                         </div>
                         <div className="flex justify-between">
                             <span className="text-slate-500">Type</span>
-                            <span className="font-medium text-slate-900 capitalize">{adOption.title}</span>
+                            <span className="font-medium text-slate-900 capitalize">{selectedFormat.title}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-slate-500">Target Views</span>
@@ -92,7 +85,7 @@ const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) 
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Cardholder Name</Label>
-                        <Input id="name" placeholder="John Doe" />
+                        <Input id="name" placeholder="John Doe"/>
                     </div>
                     <div className="space-y-2">
                         <Label>Card Details</Label>
@@ -115,11 +108,11 @@ const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) 
                             />
                         </div>
                         <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
-                            <Lock className="w-3 h-3" />
+                            <Lock className="w-3 h-3"/>
                             <span>Payments processed securely by</span>
                             <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
-                                alt="Stripe" className="h-5 opacity-80 grayscale hover:grayscale-0 transition-all" />
+                                alt="Stripe" className="h-5 opacity-80 grayscale hover:grayscale-0 transition-all"/>
                         </div>
                     </div>
                 </div>
@@ -131,7 +124,7 @@ const PaymentCard = ({ details, adType, adOption, onBack }: StripePaymentProps) 
                     onClick={onBack}
                     className="text-slate-600 hover:text-slate-900 hover:bg-slate-200"
                 >
-                    <ChevronLeft className="w-4 h-4 mr-2" />
+                    <ChevronLeft className="w-4 h-4 mr-2"/>
                     Back
                 </Button>
                 <ActionButton

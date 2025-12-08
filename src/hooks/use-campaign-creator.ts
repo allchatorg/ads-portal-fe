@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { AdType } from "@/models/adType";
-import { AD_OPTIONS } from "@/constants/ad-options";
+import {useState} from "react";
+import {AD_FORMAT_MOCK_DATA, AdFormatDto, AdFormatType} from "@/data/adFormats";
+import {useSearchParams} from "next/navigation";
 
 export interface CampaignDetails {
     name: string;
@@ -17,11 +17,22 @@ export interface ValidationErrors {
 }
 
 export function useCampaignCreator() {
+    const searchParams = useSearchParams();
+    const initialFormatId = searchParams.get('formatId');
+
     // 1. Stepper State
     const [currentStep, setCurrentStep] = useState(0);
 
     // 2. Data State
-    const [adType, setAdType] = useState<AdType>('photo');
+    // Default to URL param -> PHOTO -> First Option
+    const [selectedAdFormat, setSelectedAdFormat] = useState<AdFormatDto>(() => {
+        if (initialFormatId) {
+            const found = AD_FORMAT_MOCK_DATA.find(f => f.id === Number(initialFormatId));
+            if (found) return found;
+        }
+        return AD_FORMAT_MOCK_DATA.find(f => f.type === AdFormatType.PHOTO) || AD_FORMAT_MOCK_DATA[0];
+    });
+
     const [details, setDetails] = useState<CampaignDetails>({
         name: '',
         text: '',
@@ -47,13 +58,14 @@ export function useCampaignCreator() {
         }
 
         // Only require text if it is a text ad
-        if (adType === 'text' && !details.text.trim()) {
+        if (selectedAdFormat.type === AdFormatType.TEXT && !details.text.trim()) {
             newErrors.text = 'Ad text content is required';
             isValid = false;
         }
 
         // Only require media if NOT a text ad
-        if (adType !== 'text' && !details.media && !details.mediaUrl) {
+        // You might want to refine this if you have other types in future
+        if (selectedAdFormat.type !== AdFormatType.TEXT && !details.media && !details.mediaUrl) {
             newErrors.media = 'Media (photo or video) is required';
             isValid = false;
         }
@@ -76,12 +88,11 @@ export function useCampaignCreator() {
         setCurrentStep((prev) => (prev > 0 ? prev - 1 : 0));
     };
 
-    // Select Ad Type logic (Modified)
-    const selectAdType = (type: AdType) => {
-        // Only perform updates if the type is actually different
-        // This prevents accidental data wiping if they click the same card twice
-        if (type !== adType) {
-            setAdType(type);
+    // Select Ad Type logic
+    const selectAdFormat = (format: AdFormatDto) => {
+        // Only perform updates if the type is actually different (by ID or Type)
+        if (format.id !== selectedAdFormat.id) {
+            setSelectedAdFormat(format);
             // Reset details but keep default views
             setDetails(prev => ({
                 ...prev,
@@ -97,16 +108,16 @@ export function useCampaignCreator() {
     return {
         // State
         currentStep,
-        adType,
+        selectedAdFormat,
         details,
         errors,
-        adOptions: AD_OPTIONS,
+        adFormats: AD_FORMAT_MOCK_DATA,
 
         // Actions
         goToStep,
         nextStep,
         prevStep,
-        setAdType: selectAdType,
+        setSelectedAdFormat: selectAdFormat,
         setDetails,
         setErrors
     };
