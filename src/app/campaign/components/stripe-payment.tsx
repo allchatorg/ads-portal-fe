@@ -6,9 +6,9 @@ import {Elements} from '@stripe/react-stripe-js';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {ChevronLeft, Lock} from 'lucide-react';
-import {calculateAdCost} from '@/utils/pricing-utils';
+import {calculateAdCost, createAdRequest} from '@/utils/pricing-utils';
 import {ActionButton} from '@/components/ui/action-button';
-import {AdFormatDto} from '@/data/adFormats';
+import {AdFormatDto, AdFormatType} from '@/data/adFormats';
 import {CampaignDetails} from '@/hooks/use-campaign-creator';
 import {PaymentMethodSelector} from './payment-method-selector';
 
@@ -19,20 +19,37 @@ const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 interface StripePaymentProps {
     details: CampaignDetails;
     selectedFormat: AdFormatDto;
+    adFormats: AdFormatDto[];
     onBack: () => void;
 }
 
-const PaymentCard = ({details, selectedFormat, onBack}: StripePaymentProps) => {
+const PaymentCard = ({details, selectedFormat, adFormats, onBack}: StripePaymentProps) => {
     const [selectedPaymentMethodId, setSelectedPaymentMethodId] = React.useState<string | undefined>();
 
-    const {totalCost} = calculateAdCost(selectedFormat, details.text.length, details.views);
+    const {totalCost} = calculateAdCost(selectedFormat, details.text.length, details.views, adFormats);
 
     const handleSubmit = async () => {
         if (!selectedPaymentMethodId) {
             return;
         }
 
+
         console.log('[PaymentMethod]', selectedPaymentMethodId);
+
+        const imageUrl = selectedFormat.type === AdFormatType.PHOTO ? (details.mediaUrl || undefined) : undefined;
+        const videoUrl = selectedFormat.type === AdFormatType.VIDEO ? (details.mediaUrl || undefined) : undefined;
+
+        createAdRequest({
+            adType: selectedFormat.type,
+            text: details.text,
+            imageUrl,
+            videoUrl,
+            stripeId: selectedPaymentMethodId,
+            viewsBought: details.views,
+            calculatedPrice: totalCost,
+            stripeAid: "TBD_STRIPE_ACCOUNT_ID"
+        });
+
         alert(`Payment successful with method ID: ${selectedPaymentMethodId}`);
         // Here you would typically make a call to your backend to process the payment
         // using the selectedPaymentMethodId

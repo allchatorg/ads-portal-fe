@@ -3,6 +3,7 @@ import {setupListeners} from '@reduxjs/toolkit/query';
 import {userApi} from './services/userApi';
 import {paymentApi} from './services/paymentApi';
 import {adFormatsApi} from './services/adFormatsApi';
+import {fileApi} from './services/fileApi';
 import authReducer from './slices/authSlice';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
         [userApi.reducerPath]: userApi.reducer,
         [paymentApi.reducerPath]: paymentApi.reducer,
         [adFormatsApi.reducerPath]: adFormatsApi.reducer,
+        [fileApi.reducerPath]: fileApi.reducer,
         // Add the auth slice
         auth: authReducer,
     },
@@ -20,7 +22,8 @@ export const store = configureStore({
         getDefaultMiddleware()
             .concat(userApi.middleware)
             .concat(paymentApi.middleware)
-            .concat(adFormatsApi.middleware),
+            .concat(adFormatsApi.middleware)
+            .concat(fileApi.middleware),
 });
 
 // optional, but required for refetchOnFocus/refetchOnReconnect behaviors

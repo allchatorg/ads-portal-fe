@@ -51,3 +51,19 @@ export function calculateAdCost(format: AdFormatDto, textLength: number, views: 
         totalCPM
     };
 }
+
+export interface CreateAdRequest {
+    adType: AdFormatType;
+    text: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    stripeId: string;
+    viewsBought: number;
+    calculatedPrice: number;
+    stripeAid: string;
+}
+
+export function createAdRequest(data: CreateAdRequest): CreateAdRequest {
+    console.log("PAYMENT_LOG:", data);
+    return data;
+}

@@ -74,6 +74,7 @@ export default function Page() {
                                 <StripePayment
                                     details={details}
                                     selectedFormat={selectedAdFormat}
+                                    adFormats={adFormats}
                                     onBack={prevStep}
                                 />
                             </div>

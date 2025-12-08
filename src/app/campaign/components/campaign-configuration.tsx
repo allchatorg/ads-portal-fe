@@ -2,8 +2,8 @@
 
 import {useCallback, useEffect} from "react";
 import {CampaignDetails, ValidationErrors} from "@/hooks/use-campaign-creator";
-import {CheckCircle2, ChevronLeft, FileText, Image as ImageIcon, Info, Play, Upload, X} from "lucide-react";
-import Image from "next/image";
+import {CheckCircle2, ChevronLeft, FileText, Image as ImageIcon, Info, Loader2, Play, Upload, X} from "lucide-react";
+
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import {Input} from "@/components/ui/input";
@@ -17,6 +17,8 @@ import * as z from "zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
 import {AdFormatDto, AdFormatType} from "@/data/adFormats";
 import {MAX_CHAR_COUNT} from "@/utils/pricing-utils";
+import {useUploadFileMutation} from "@/store/services/fileApi";
+import {toast} from "sonner";
 
 interface CampaignConfigurationProps {
     selectedFormat: AdFormatDto;
@@ -72,6 +74,8 @@ export default function CampaignConfiguration({
         mode: "onChange", // Validate on change for immediate feedback
     });
 
+    const [uploadFile, {isLoading: isUploading}] = useUploadFileMutation();
+
     // Sync form values to parent state for CostEstimationCard
     // We watch all fields and update parent state
     useEffect(() => {
@@ -89,25 +93,52 @@ export default function CampaignConfiguration({
     }, [form, form.watch, setDetails]);
 
 
-    const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, fieldChange: (file: File | null) => void) => {
+    const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, fieldChange: (file: File | null) => void) => {
         const file = e.target.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
+            // 1. Immediate preview
+            const objectUrl = URL.createObjectURL(file);
             fieldChange(file);
-            form.setValue('mediaUrl', url);
-            // Parent state update handled by watcher
-        }
-    }, [form]);
+            form.setValue('mediaUrl', objectUrl);
 
-    const handleDrop = useCallback((e: React.DragEvent, fieldChange: (file: File | null) => void) => {
+            try {
+                // 2. Upload to server
+                const serverUrl = await uploadFile(file).unwrap();
+
+                // 3. Update with real URL on success
+                form.setValue('mediaUrl', serverUrl);
+                toast.success("Media uploaded successfully");
+            } catch (error) {
+                console.error("Upload failed", error);
+                toast.error("Failed to upload media. Please try again.");
+                // Optional: remove the preview if upload fails?
+                // For now, we keep it so they can retry or see what they selected
+            }
+        }
+    }, [form, uploadFile]);
+
+    const handleDrop = useCallback(async (e: React.DragEvent, fieldChange: (file: File | null) => void) => {
         e.preventDefault();
         const file = e.dataTransfer.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
+            // 1. Immediate preview
+            const objectUrl = URL.createObjectURL(file);
             fieldChange(file);
-            form.setValue('mediaUrl', url);
+            form.setValue('mediaUrl', objectUrl);
+
+            try {
+                // 2. Upload to server
+                const serverUrl = await uploadFile(file).unwrap();
+
+                // 3. Update with real URL on success
+                form.setValue('mediaUrl', serverUrl);
+                toast.success("Media uploaded successfully");
+            } catch (error) {
+                console.error("Upload failed", error);
+                toast.error("Failed to upload media. Please try again.");
+            }
         }
-    }, [form]);
+    }, [form, uploadFile]);
 
     const removeMedia = () => {
         form.setValue('media', null);
@@ -115,6 +146,21 @@ export default function CampaignConfiguration({
     };
 
     const onSubmit = () => {
+        // Validation: Ensure we don't submit a blob URL
+        const currentMediaUrl = form.getValues('mediaUrl');
+
+        if (selectedFormat.type !== AdFormatType.TEXT) {
+            if (!currentMediaUrl) {
+                toast.error("Please upload media for your ad");
+                return;
+            }
+
+            if (currentMediaUrl.startsWith('blob:')) {
+                toast.error("Please wait for media upload to complete");
+                return;
+            }
+        }
+
         // Form is valid, proceed
         onNext();
     };
@@ -251,11 +297,10 @@ export default function CampaignConfiguration({
                                                                     <video src={form.getValues('mediaUrl')!} controls
                                                                            className="max-h-full max-w-full"/>
                                                                 ) : (
-                                                                    <Image
+                                                                    <img
                                                                         src={form.getValues('mediaUrl')!}
                                                                         alt="Preview"
-                                                                        fill
-                                                                        className="object-contain"
+                                                                        className="absolute inset-0 w-full h-full object-contain"
                                                                     />
                                                                 )}
                                                                 <button
@@ -265,6 +310,17 @@ export default function CampaignConfiguration({
                                                                 >
                                                                     <X size={16}/>
                                                                 </button>
+                                                                {isUploading && (
+                                                                    <div
+                                                                        className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 transition-all rounded-xl">
+                                                                        <div
+                                                                            className="flex flex-col items-center gap-2 text-white">
+                                                                            <Loader2 className="w-8 h-8 animate-spin"/>
+                                                                            <span
+                                                                                className="text-sm font-medium">Uploading...</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </FormControl>
@@ -314,8 +370,9 @@ export default function CampaignConfiguration({
                                 <ActionButton
                                     type="submit"
                                     icon={CheckCircle2}
+                                    disabled={isUploading}
                                 >
-                                    Next Step
+                                    {isUploading ? 'Uploading...' : 'Next Step'}
                                 </ActionButton>
                             </div>
                         </CardFooter>
