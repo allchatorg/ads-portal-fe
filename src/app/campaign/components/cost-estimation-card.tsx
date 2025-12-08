@@ -1,7 +1,7 @@
 import {Card, CardContent} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Slider} from "@/components/ui/slider";
-import {AdFormatDto, AdFormatType} from "@/data/adFormats";
+import {AD_FORMAT_MOCK_DATA, AdFormatDto, AdFormatType} from "@/data/adFormats";
 import {CampaignDetails} from "@/hooks/use-campaign-creator";
 import {useMemo} from "react";
 import {calculateAdCost} from "@/utils/pricing-utils";
@@ -25,6 +25,18 @@ export default function CostEstimationCard({
     }, [details.views, details.text.length, selectedFormat]);
 
     const {totalCost, baseCPM, textCPM, totalCPM} = pricingData;
+
+    // Determine which tiers to show in the tooltip
+    const effectiveTiers = useMemo(() => {
+        if (selectedFormat.pricingTiers && selectedFormat.pricingTiers.length > 0) {
+            return selectedFormat.pricingTiers;
+        }
+        // Fallback to TEXT format tiers if current format has none (e.g. Photo/Video with text component)
+        const textFormat = AD_FORMAT_MOCK_DATA.find(f => f.type === AdFormatType.TEXT);
+        return textFormat?.pricingTiers || [];
+    }, [selectedFormat]);
+
+    const showTextPricing = textCPM > 0 || selectedFormat.type === AdFormatType.TEXT;
 
     return (
         <Card className="border-slate-200 shadow-sm h-full">
@@ -60,19 +72,19 @@ export default function CostEstimationCard({
 
                     {/* Cost Breakdown */}
                     <div className="space-y-3 text-sm">
-                        {/* Show Base CPM if not a Text ad (or if strictly separate) */}
-                        {selectedFormat.type !== AdFormatType.TEXT && (
+                        {/* Show Base CPM if it is non-zero */}
+                        {baseCPM > 0 && (
                             <div className="flex justify-between items-center">
                                 <span className="text-slate-600">Base CPM</span>
                                 <span className="font-medium text-slate-900">${baseCPM.toFixed(2)}</span>
                             </div>
                         )}
 
-                        {/* Show Text Tier Info if Text Ad */}
-                        {selectedFormat.type === AdFormatType.TEXT && (
+                        {/* Show Text Tier Info if applicable */}
+                        {showTextPricing && (
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-1">
-                                    <span className="text-slate-600">Tier Pricing ({details.text.length} chars)</span>
+                                    <span className="text-slate-600">Text Component ({details.text.length} chars)</span>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <Info className="w-3 h-3 text-slate-400 hover:text-slate-600 cursor-help"/>
@@ -80,7 +92,7 @@ export default function CostEstimationCard({
                                         <TooltipContent>
                                             <div className="text-xs space-y-1">
                                                 <p className="font-semibold">Text Pricing Tiers:</p>
-                                                {selectedFormat.pricingTiers?.map((tier, idx) => (
+                                                {effectiveTiers.map((tier, idx) => (
                                                     <p key={idx}>Up to {tier.maxCharacters} chars:
                                                         ${tier.pricePerMille} CPM</p>
                                                 ))}

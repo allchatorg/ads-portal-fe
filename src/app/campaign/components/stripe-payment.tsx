@@ -2,16 +2,15 @@
 
 import React from 'react';
 import {loadStripe} from '@stripe/stripe-js';
-import {CardElement, Elements, useElements, useStripe} from '@stripe/react-stripe-js';
+import {Elements} from '@stripe/react-stripe-js';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
-import {Label} from '@/components/ui/label';
-import {Input} from '@/components/ui/input';
 import {ChevronLeft, Lock} from 'lucide-react';
 import {calculateAdCost} from '@/utils/pricing-utils';
 import {ActionButton} from '@/components/ui/action-button';
 import {AdFormatDto} from '@/data/adFormats';
 import {CampaignDetails} from '@/hooks/use-campaign-creator';
+import {PaymentMethodSelector} from './payment-method-selector';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -24,38 +23,26 @@ interface StripePaymentProps {
 }
 
 const PaymentCard = ({details, selectedFormat, onBack}: StripePaymentProps) => {
-    const stripe = useStripe();
-    const elements = useElements();
+    const [selectedPaymentMethodId, setSelectedPaymentMethodId] = React.useState<string | undefined>();
 
     const {totalCost} = calculateAdCost(selectedFormat, details.text.length, details.views);
 
     const handleSubmit = async () => {
-        if (!stripe || !elements) {
+        if (!selectedPaymentMethodId) {
             return;
         }
 
-        const cardElement = elements.getElement(CardElement);
-
-        if (cardElement) {
-            const {error, paymentMethod} = await stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-            });
-
-            if (error) {
-                console.log('[error]', error);
-            } else {
-                console.log('[PaymentMethod]', paymentMethod);
-                alert('Payment Method Created! Check console for details.');
-            }
-        }
+        console.log('[PaymentMethod]', selectedPaymentMethodId);
+        alert(`Payment successful with method ID: ${selectedPaymentMethodId}`);
+        // Here you would typically make a call to your backend to process the payment
+        // using the selectedPaymentMethodId
     };
 
     return (
         <Card className="w-full max-w-md mx-auto border-slate-200 shadow-sm">
             <CardHeader className="border-b border-slate-200">
                 <CardTitle>Payment Method</CardTitle>
-                <CardDescription>Enter your card details to complete the purchase.</CardDescription>
+                <CardDescription>Select a saved card or add a new one to complete purchase.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
                 {/* Order Summary */}
@@ -81,39 +68,19 @@ const PaymentCard = ({details, selectedFormat, onBack}: StripePaymentProps) => {
                     </div>
                 </div>
 
-                {/* Form Fields */}
+                {/* Payment Selection */}
                 <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Cardholder Name</Label>
-                        <Input id="name" placeholder="John Doe"/>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Card Details</Label>
-                        <div className="p-3 border rounded-md bg-background">
-                            <CardElement
-                                options={{
-                                    style: {
-                                        base: {
-                                            fontSize: '16px',
-                                            color: '#424770',
-                                            '::placeholder': {
-                                                color: '#aab7c4',
-                                            },
-                                        },
-                                        invalid: {
-                                            color: '#9e2146',
-                                        },
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
-                            <Lock className="w-3 h-3"/>
-                            <span>Payments processed securely by</span>
-                            <img
-                                src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
-                                alt="Stripe" className="h-5 opacity-80 grayscale hover:grayscale-0 transition-all"/>
-                        </div>
+                    <PaymentMethodSelector
+                        selectedPaymentMethodId={selectedPaymentMethodId}
+                        onSelect={setSelectedPaymentMethodId}
+                    />
+
+                    <div className="flex items-center gap-2 text-xs text-slate-500 justify-center">
+                        <Lock className="w-3 h-3"/>
+                        <span>Payments processed securely by</span>
+                        <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
+                            alt="Stripe" className="h-5 opacity-80 grayscale hover:grayscale-0 transition-all"/>
                     </div>
                 </div>
             </CardContent>
@@ -128,7 +95,7 @@ const PaymentCard = ({details, selectedFormat, onBack}: StripePaymentProps) => {
                     Back
                 </Button>
                 <ActionButton
-                    disabled={!stripe}
+                    disabled={!selectedPaymentMethodId}
                     type="submit"
                     icon={Lock}
                     onClick={handleSubmit}

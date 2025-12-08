@@ -9,7 +9,11 @@ import {ActionButton} from "./ui/action-button";
 import {useAddPaymentMethodMutation} from "@/store/services/paymentApi";
 import {toast} from "sonner";
 
-export function AddCardForm() {
+interface AddCardFormProps {
+    onSuccess?: () => void;
+}
+
+export function AddCardForm({onSuccess}: AddCardFormProps) {
     const stripe = useStripe();
     const elements = useElements();
     const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +43,7 @@ export function AddCardForm() {
                     await addPaymentMethod({paymentMethodId: paymentMethod.id}).unwrap();
                     toast.success("Payment method added successfully");
                     cardElement.clear();
+                    onSuccess?.();
                 } catch (apiError) {
                     toast.error("Failed to save payment method on server");
                 }
