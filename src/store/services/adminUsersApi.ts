@@ -8,11 +8,19 @@ export const adminUsersApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ['AdminUsers'],
     endpoints: (builder) => ({
-        getUsers: builder.query<PaginatedResponse<AdminUserDto>, { page: number; size: number; sort?: string }>({
+        getUsers: builder.query<PaginatedResponse<AdminUserDto>, {
+            userId?: number;
+            email?: string;
+            page: number;
+            size: number;
+            sort?: string
+        }>({
             query: (params) => ({
                 url: '/admin/users',
                 method: 'GET',
                 params: {
+                    userId: params.userId,
+                    email: params.email,
                     page: params.page,
                     size: params.size,
                     sort: params.sort,

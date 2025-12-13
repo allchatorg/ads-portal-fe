@@ -1,22 +1,22 @@
-'use client';
+"use client";
 import {Card} from "@/components/ui/card";
 import {ShoppingBag, UserCircle} from "lucide-react";
 import {useParams, usePathname} from "next/navigation";
-import React, {ReactNode, useMemo} from "react";
+import React, {ReactNode} from "react";
 import {NavigationTabs} from "@/components/NavigationTabs";
 import {TabConfig} from "@/models/TabConfig";
-import {MOCK_USERS} from "@/data/mock-users";
 import {SiteHeader} from "@/components/site-header";
+import {useGetUserByIdQuery} from "@/store/services/adminUsersApi";
 
 export default function UserLayout({children}: { children: ReactNode }) {
     const params = useParams();
     const pathname = usePathname();
+    const userId = Number(params.id);
     const basePath = `/admin/users/${params.id}`;
 
-    // Find the user from mock data
-    const user = useMemo(() => {
-        return MOCK_USERS.find(u => u.id === params.id);
-    }, [params.id]);
+    const {data: user, isLoading} = useGetUserByIdQuery(userId, {
+        skip: isNaN(userId),
+    });
 
     const tabs: TabConfig[] = [
         {
@@ -36,8 +36,12 @@ export default function UserLayout({children}: { children: ReactNode }) {
     const currentTab = tabs.find(tab => pathname === tab.href) || tabs[0];
     const activeTabValue = pathname.split('/').pop() || 'details';
 
-    if (!user) {
+    if (isLoading) {
         return <div className="p-6">Loading user data...</div>;
+    }
+
+    if (!user) {
+        return <div className="p-6">User not found</div>;
     }
 
     return (

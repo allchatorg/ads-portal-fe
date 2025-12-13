@@ -1,16 +1,21 @@
 "use client";
 import {useParams} from "next/navigation";
-import {useMemo} from "react";
-import {MOCK_USERS} from "@/data/mock-users";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
+import {useGetUserByIdQuery} from "@/store/services/adminUsersApi";
+import {UserRole} from "@/models/user-role";
 
 export default function UserDetailsPage() {
     const params = useParams();
+    const userId = Number(params.id);
 
-    const user = useMemo(() => {
-        return MOCK_USERS.find(u => u.id === params.id);
-    }, [params.id]);
+    const {data: user, isLoading} = useGetUserByIdQuery(userId, {
+        skip: isNaN(userId),
+    });
+
+    if (isLoading) {
+        return <div>Loading user details...</div>;
+    }
 
     if (!user) {
         return <div>User not found</div>;
@@ -27,7 +32,7 @@ export default function UserDetailsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Name</p>
-                            <p className="text-base font-semibold">{user.name}</p>
+                            <p className="text-base font-semibold">{user.firstName} {user.lastName}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Email</p>
@@ -39,7 +44,8 @@ export default function UserDetailsPage() {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Role</p>
-                            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="capitalize">
+                            <Badge variant={user.role === UserRole.ADMIN ? 'default' : 'secondary'}
+                                   className="capitalize">
                                 {user.role}
                             </Badge>
                         </div>
@@ -65,7 +71,7 @@ export default function UserDetailsPage() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col items-center justify-center p-6 border rounded-lg">
-                            <p className="text-3xl font-bold text-blue-600">{user.totalPurchasedAds}</p>
+                            <p className="text-3xl font-bold text-blue-600">{user.totalPurchasedAdsCount}</p>
                             <p className="text-sm text-muted-foreground mt-1">Total Ads Purchased</p>
                         </div>
                         <div className="flex flex-col items-center justify-center p-6 border rounded-lg">

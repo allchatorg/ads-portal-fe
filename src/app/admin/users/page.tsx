@@ -1,12 +1,17 @@
 "use client"
 
+import {useMemo, useState} from "react"
+import {useGetUsersQuery} from "@/store/services/adminUsersApi"
 import {SiteHeader} from "@/components/site-header"
 import {UsersTable} from "@/components/users-table"
 import {useUsersParams} from "@/hooks/use-users-params"
-import {MOCK_USERS} from "@/data/mock-users"
-import {useMemo} from "react"
+
+import {sortParamsToQueryString} from "@/lib/utils"
 
 export default function AdminUsersPage() {
+    const [page, setPage] = useState(0)
+    const [size] = useState(10)
+
     const {
         sort,
         searchQuery,
@@ -15,39 +20,36 @@ export default function AdminUsersPage() {
         clearParams
     } = useUsersParams()
 
-    const filteredUsers = useMemo(() => {
-        let result = [...MOCK_USERS]
+    // Parse search query to determine if it's a User ID or Email
+    const {userId, email} = useMemo(() => {
+        if (!searchQuery) return {userId: undefined, email: undefined}
 
-        // Search filter
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase()
-            result = result.filter(user =>
-                user.email.toLowerCase().includes(query) ||
-                user.id.toLowerCase().includes(query) ||
-                user.name.toLowerCase().includes(query)
-            )
+        const isNumeric = /^\d+$/.test(searchQuery)
+        if (isNumeric) {
+            return {userId: parseInt(searchQuery), email: undefined}
         }
+        return {userId: undefined, email: searchQuery}
+    }, [searchQuery])
 
-        // Sort
-        const [sortField, sortOrder] = sort.split(",")
+    const formattedSort = useMemo(() => {
+        if (!sort) return undefined
+        const [field, direction] = sort.split(",")
+        return sortParamsToQueryString([{
+            id: field,
+            desc: direction === "desc"
+        }])
+    }, [sort])
 
-        result.sort((a, b) => {
-            let valA = a[sortField as keyof typeof a]
-            let valB = b[sortField as keyof typeof b]
+    const {data, isLoading} = useGetUsersQuery({
+        page,
+        size,
+        sort: formattedSort,
+        userId,
+        email
+    })
 
-            // Handle numeric sorting
-            if (sortField === 'totalPurchasedAds' || sortField === 'totalSpent') {
-                valA = Number(valA)
-                valB = Number(valB)
-            }
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1
-            return 0
-        })
-
-        return result
-    }, [sort, searchQuery])
+    const users = data?.content || []
+    const totalPages = data?.totalPages || 0
 
     return (
         <div className="w-full">
@@ -57,12 +59,15 @@ export default function AdminUsersPage() {
             />
             <div className="w-full px-4 lg:px-6 py-4 md:gap-6 md:py-6">
                 <UsersTable
-                    users={filteredUsers}
+                    users={users}
                     sort={sort}
                     onSortChange={setSort}
                     searchQuery={searchQuery}
                     onSearchQueryChange={setSearchQuery}
                     onClearFilters={clearParams}
+                    page={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
                 />
             </div>
         </div>

@@ -7,15 +7,19 @@ import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {ArrowUpDown, Eye, Search, X} from "lucide-react"
 import {useRouter} from "next/navigation"
-import {User} from "@/models/user"
+import {AdminUserDto} from "@/models/admin-user"
+import {UserRole} from "@/models/user-role"
 
 interface UsersTableProps {
-    users: User[]
+    users: AdminUserDto[]
     sort: string
     onSortChange: (value: string) => void
     searchQuery: string
     onSearchQueryChange: (value: string) => void
     onClearFilters: () => void
+    page: number
+    totalPages: number
+    onPageChange: (page: number) => void
 }
 
 export function UsersTable({
@@ -24,7 +28,10 @@ export function UsersTable({
                                onSortChange,
                                searchQuery,
                                onSearchQueryChange,
-                               onClearFilters
+                               onClearFilters,
+                               page,
+                               totalPages,
+                               onPageChange
                            }: UsersTableProps) {
     const router = useRouter()
 
@@ -76,7 +83,7 @@ export function UsersTable({
                             <TableHead className="text-right">
                                 <Button
                                     variant="ghost"
-                                    onClick={() => toggleSort("totalPurchasedAds")}
+                                    onClick={() => toggleSort("totalPurchasedAdsCount")}
                                     className="-ml-4 h-8 data-[state=open]:bg-accent"
                                 >
                                     Ads Purchased
@@ -110,16 +117,16 @@ export function UsersTable({
                         ) : (
                             users.map((user) => (
                                 <TableRow key={user.id}>
-                                    <TableCell className="font-medium">{user.name}</TableCell>
+                                    <TableCell className="font-medium">{user.firstName} {user.lastName}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell className="text-muted-foreground text-xs">{user.id}</TableCell>
                                     <TableCell>
-                                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}
+                                        <Badge variant={user.role === UserRole.ADMIN ? 'default' : 'secondary'}
                                                className="capitalize">
                                             {user.role}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-right">{user.totalPurchasedAds}</TableCell>
+                                    <TableCell className="text-right">{user.totalPurchasedAdsCount}</TableCell>
                                     <TableCell
                                         className="text-right font-semibold">${user.totalSpent.toFixed(2)}</TableCell>
                                     <TableCell className="text-muted-foreground">
@@ -140,6 +147,27 @@ export function UsersTable({
                         )}
                     </TableBody>
                 </Table>
+            </div>
+            <div className="flex items-center justify-end space-x-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onPageChange(page - 1)}
+                    disabled={page === 0}
+                >
+                    Previous
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                    Page {page + 1} of {Math.max(1, totalPages)}
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onPageChange(page + 1)}
+                    disabled={page >= totalPages - 1}
+                >
+                    Next
+                </Button>
             </div>
         </div>
     )
