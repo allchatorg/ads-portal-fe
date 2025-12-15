@@ -90,6 +90,7 @@ export const {setUser, clearUser} = authSlice.actions;
 
 // Selectors
 export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectCurrentUserId = (state: RootState) => state.auth.user?.id;
 export const selectCurrentToken = (state: RootState) => state.auth.token;
 export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
 export const selectIsAdmin = (state: RootState) => state.auth.user?.role === Role.ADMIN;

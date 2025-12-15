@@ -71,3 +71,38 @@ export interface AdStatusCount {
     status: AdStatus;
     count: number;
 }
+
+export interface ServeAdRequest {
+    userId?: number;
+    ipAddress?: string;
+}
+
+export interface ServedAd {
+    title: string;
+    text?: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    format: AdFormatType;
+}
+
+export interface AdDailyStat {
+    date: string; // ISO date string YYYY-MM-DD
+    viewsCount: number;
+}
+
+export interface AdDailyStatsResponse {
+    adId: number;
+    viewsBought: number;
+    servedViews: number;
+    todaysViews: number;
+    dailyStats: AdDailyStat[];
+}
+
+export interface DailyViewStats {
+    date: string; // ISO date string YYYY-MM-DD
+    viewsCount: number;
+}
+
+export interface UserAdViewsDailyBreakdownDto {
+    dailyViews: DailyViewStats[];
+}

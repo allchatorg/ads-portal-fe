@@ -11,7 +11,7 @@ export function ConditionalLayout({children}: { children: React.ReactNode }) {
     const isResetPasswordPage = pathname === "/reset-password" || pathname.startsWith("/reset-password?")
 
     if (isHomePage || isAuthPage || isResetPasswordPage) {
-            return <>{children}</>
+        return <>{children}</>
     }
 
 

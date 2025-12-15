@@ -1,29 +1,62 @@
+"use client"
+
 import {ChartAreaInteractive} from "@/components/chart-area-interactive"
 import {AdsTable} from "@/components/ads-table"
 import {SectionCards} from "@/components/section-cards"
 import {SiteHeader} from "@/components/site-header"
-import {AdItem} from "@/models/ad-item"
-
-import adsData from "./ads.json"
-
-const ads = adsData as AdItem[]
+import {
+    useGetAdStatusCountsByUserQuery,
+    useGetUserAdViewsDailyBreakdownQuery,
+    useSearchAdsQuery
+} from "@/store/services/adsApi"
+import {AdStatus} from "@/models/ad"
+import {useUser} from "@/hooks/use-user"
 
 export default function Page() {
-    return (<div>
-        <SiteHeader title={'Dashboard'} description={'Overview of you ads performance'}/>
-        <div className="flex flex-1 flex-col">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <SectionCards/>
-                    <div className="px-4 lg:px-6">
-                        <ChartAreaInteractive/>
-                    </div>
-                    <div className="px-4 lg:px-6">
-                        <h2 className="text-xl font-semibold mb-3">Active ads</h2>
-                        <AdsTable ads={ads}/>
+    const {currentUserId} = useUser();
+
+    // Fetch ad status counts for the current user
+    const {data: statusCounts, isLoading: isLoadingCounts} = useGetAdStatusCountsByUserQuery();
+
+    // Fetch user's daily views for the chart
+    const {data: dailyViewsData, isLoading: isLoadingChart} = useGetUserAdViewsDailyBreakdownQuery();
+
+    // Fetch active ads for the table
+    const {data: activeAdsData, isLoading: isLoadingAds} = useSearchAdsQuery({
+        status: AdStatus.ACTIVE,
+        page: 0,
+        size: 10,
+        userId: currentUserId,
+    });
+
+    const activeAds = activeAdsData?.content ?? [];
+
+    return (
+        <div>
+            <SiteHeader title={'Dashboard'} description={'Overview of your ads performance'}/>
+            <div className="flex flex-1 flex-col">
+                <div className="@container/main flex flex-1 flex-col gap-2">
+                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                        <SectionCards statusCounts={statusCounts} isLoading={isLoadingCounts}/>
+                        <div className="px-4 lg:px-6">
+                            <ChartAreaInteractive
+                                dailyViews={dailyViewsData?.dailyViews}
+                                isLoading={isLoadingChart}
+                            />
+                        </div>
+                        <div className="px-4 lg:px-6">
+                            <h2 className="text-xl font-semibold mb-3">Active ads</h2>
+                            {isLoadingAds ? (
+                                <div className="text-muted-foreground">Loading ads...</div>
+                            ) : activeAds.length === 0 ? (
+                                <div className="text-muted-foreground">No active ads found.</div>
+                            ) : (
+                                <AdsTable ads={activeAds}/>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>)
+    )
 }

@@ -1,7 +1,7 @@
 'use client'
 import {SiteHeader} from "@/components/site-header";
 import {AdDetailsStats} from "@/app/ads/[id]/components/ad-details-stats";
-import {useGetAdByIdQuery} from "@/store/services/adsApi";
+import {useGetAdByIdQuery, useGetAdDailyStatsQuery} from "@/store/services/adsApi";
 import {useParams} from "next/navigation";
 import {Card, CardContent} from "@/components/ui/card";
 import {Loader2} from "lucide-react";
@@ -12,6 +12,7 @@ export default function UserAdDetailsPage() {
     const adId = Number(params.id);
 
     const {data: adData, isLoading, error} = useGetAdByIdQuery(adId);
+    const {data: statsData} = useGetAdDailyStatsQuery({id: adId});
 
     if (isLoading) {
         return (
@@ -75,6 +76,7 @@ export default function UserAdDetailsPage() {
                         <AdDetailsStats
                             status={adData.status}
                             isAdmin={false}
+                            stats={statsData}
                         />
 
                         <AdStatusDetails

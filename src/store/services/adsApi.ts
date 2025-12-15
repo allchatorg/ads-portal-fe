@@ -1,7 +1,16 @@
 import {createApi} from '@reduxjs/toolkit/query/react';
 import {baseQuery} from './baseQuery';
 import {CreateAdRequest} from '@/utils/pricing-utils';
-import {Ad, AdSearchRequest, AdStatusCount, PaginatedResponse} from '@/models/ad';
+import {
+    Ad,
+    AdDailyStatsResponse,
+    AdSearchRequest,
+    AdStatusCount,
+    PaginatedResponse,
+    ServeAdRequest,
+    ServedAd,
+    UserAdViewsDailyBreakdownDto
+} from '@/models/ad';
 import {AdStatusDetails} from '@/models/ad-status-details';
 
 // Define the service using a base URL and expected endpoints
@@ -52,6 +61,32 @@ export const adsApi = createApi({
             }),
             providesTags: (result, error, id) => [{type: 'Ads', id}],
         }),
+        // Serve Ad
+        serveAd: builder.mutation<ServedAd, ServeAdRequest>({
+            query: (data) => ({
+                url: '/ads/serve',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+        // Get Ad Daily Stats
+        getAdDailyStats: builder.query<AdDailyStatsResponse, { id: number, fromDate?: string }>({
+            query: ({id, fromDate}) => ({
+                url: `/ads/${id}/daily-stats`,
+                method: 'GET',
+                params: {fromDate},
+            }),
+            providesTags: (result, error, {id}) => [{type: 'Ads', id}],
+        }),
+        // Get User's Aggregated Daily Views
+        getUserAdViewsDailyBreakdown: builder.query<UserAdViewsDailyBreakdownDto, { fromDate?: string } | void>({
+            query: (params) => ({
+                url: '/ads/my-stats/daily',
+                method: 'GET',
+                params: params ? {fromDate: params.fromDate} : undefined,
+            }),
+            providesTags: ['Ads'],
+        }),
     }),
 });
 
@@ -61,4 +96,7 @@ export const {
     useSearchAdsQuery,
     useGetAdStatusCountsByUserQuery,
     useGetAdByIdQuery,
+    useServeAdMutation,
+    useGetAdDailyStatsQuery,
+    useGetUserAdViewsDailyBreakdownQuery,
 } = adsApi;

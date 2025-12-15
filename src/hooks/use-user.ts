@@ -1,7 +1,7 @@
-import { UserRole } from "@/models/user-role";
-import { useAppSelector } from "@/store/hooks";
-import { selectCurrentUser, selectIsAdmin, selectIsAuthenticated } from "@/store/slices/authSlice";
-import { Role } from "@/store/services/userApi";
+import {UserRole} from "@/models/user-role";
+import {useAppSelector} from "@/store/hooks";
+import {selectCurrentUser, selectIsAdmin, selectIsAuthenticated} from "@/store/slices/authSlice";
+import {Role} from "@/store/services/userApi";
 
 export interface User {
     id: string;
@@ -44,6 +44,7 @@ export function useUser() {
 
     return {
         user,
+        currentUserId: currentUser?.id,
         isLoading,
         isAuthenticated,
         isAdmin,
