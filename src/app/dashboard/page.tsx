@@ -40,7 +40,7 @@ export default function Page() {
                         <SectionCards statusCounts={statusCounts} isLoading={isLoadingCounts}/>
                         <div className="px-4 lg:px-6">
                             <ChartAreaInteractive
-                                dailyViews={dailyViewsData?.dailyViews}
+                                dailyViews={dailyViewsData?.dailyViews?.slice().reverse() ?? []}
                                 isLoading={isLoadingChart}
                             />
                         </div>

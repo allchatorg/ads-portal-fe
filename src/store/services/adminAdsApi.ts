@@ -51,6 +51,14 @@ export const adminAdsApi = createApi({
             }),
             providesTags: ['AdminAds'],
         }),
+        // Get Ad Status Counts By User ID (Admin)
+        getAdStatusCountsByUserId: builder.query<AdStatusCount[], number>({
+            query: (userId) => ({
+                url: `/admin/ads/status-counts/${userId}`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminAds'],
+        }),
         // Get Purchased Ads Daily Counts (Admin)
         getPurchasedAdsCounts: builder.query<PurchasedAdsDailyCountDto, { fromDate?: string } | void>({
             query: (params) => ({
@@ -125,6 +133,7 @@ export const {
     useSearchAdsQuery,
     useLazySearchAdsQuery,
     useGetAdStatusCountsQuery,
+    useGetAdStatusCountsByUserIdQuery,
     useGetPurchasedAdsCountsQuery,
     useGetDailyRevenueQuery,
     useGetMonthlyRevenueQuery,
