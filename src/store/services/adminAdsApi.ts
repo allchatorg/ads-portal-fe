@@ -1,6 +1,13 @@
 import {createApi} from '@reduxjs/toolkit/query/react';
 import {baseQuery} from './baseQuery';
-import {Ad, AdSearchRequest, AdStatusCount, PaginatedResponse} from '@/models/ad';
+import {
+    Ad,
+    AdSearchRequest,
+    AdStatusCount,
+    PaginatedResponse,
+    PurchasedAdsDailyCountDto,
+    RevenueDto
+} from '@/models/ad';
 import {AdStatusDetails} from '@/models/ad-status-details';
 
 // Request DTO for ad rejection
@@ -41,6 +48,23 @@ export const adminAdsApi = createApi({
                 method: 'GET',
             }),
             providesTags: ['AdminAds'],
+        }),
+        // Get Purchased Ads Daily Counts (Admin)
+        getPurchasedAdsCounts: builder.query<PurchasedAdsDailyCountDto, { fromDate?: string } | void>({
+            query: (params) => ({
+                url: '/admin/ads/purchased-counts',
+                method: 'GET',
+                params: params ? {fromDate: params.fromDate} : undefined,
+            }),
+            providesTags: ['AdminAds'],
+        }),
+        // Get Daily Revenue
+        getDailyRevenue: builder.query<RevenueDto, void>({
+            query: () => ({
+                url: '/admin/ads//revenue/daily-summary',
+                method: 'GET',
+            }),
+            providesTags: ['AdminAds'], // Using AdminAds tag for now
         }),
         // Get Ad By ID (Admin)
         getAdById: builder.query<AdStatusDetails, number>({
@@ -83,6 +107,8 @@ export const {
     useSearchAdsQuery,
     useLazySearchAdsQuery,
     useGetAdStatusCountsQuery,
+    useGetPurchasedAdsCountsQuery,
+    useGetDailyRevenueQuery,
     useGetAdByIdQuery,
     useRejectAdMutation,
     useApproveAdMutation,

@@ -106,3 +106,18 @@ export interface DailyViewStats {
 export interface UserAdViewsDailyBreakdownDto {
     dailyViews: DailyViewStats[];
 }
+
+export interface DailyPurchaseCount {
+    date: string; // ISO date string YYYY-MM-DD
+    count: number;
+}
+
+export interface PurchasedAdsDailyCountDto {
+    dailyCounts: DailyPurchaseCount[];
+    totalCount: number;
+}
+
+export interface RevenueDto {
+    todayRevenue: number;
+    yesterdayRevenue: number;
+}

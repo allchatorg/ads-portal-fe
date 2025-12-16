@@ -1,11 +1,21 @@
+"use client"
+
 import {SiteHeader} from "@/components/site-header"
 import {AdminSectionCards} from "@/components/admin-section-cards"
 import {ChartAreaPurchasedAds} from "@/components/chart-area-purchased-ads"
 import {ChartBarRevenue} from "@/components/chart-bar-revenue"
 import {AdsTable} from "@/components/ads-table"
-import {MOCK_ADS} from "@/data/mock-ads"
+import {useSearchAdsQuery} from "@/store/services/adminAdsApi"
+import {AdStatus} from "@/models/ad"
 
 export default function AdminDashboardPage() {
+    const {data} = useSearchAdsQuery({
+        status: AdStatus.SUBMITTED,
+        size: 100,
+        page: 0,
+        sort: "submittedDate,desc"
+    })
+
     return (
         <div>
             <SiteHeader
@@ -25,7 +35,7 @@ export default function AdminDashboardPage() {
                         <div className="px-4 lg:px-6">
                             <h2 className="text-lg font-semibold mb-4">Submitted Ads</h2>
                             <AdsTable
-                                ads={MOCK_ADS.filter(ad => ad.approvalState === 'submitted')}
+                                ads={data?.content || []}
                                 viewDetailsPath="/admin/ads"
                             />
                         </div>
