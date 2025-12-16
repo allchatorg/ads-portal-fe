@@ -4,9 +4,11 @@ import {
     Ad,
     AdSearchRequest,
     AdStatusCount,
+    MonthlyRevenueResponseDto,
     PaginatedResponse,
     PurchasedAdsDailyCountDto,
-    RevenueDto
+    RevenueDto,
+    WeeklyRevenueResponseDto
 } from '@/models/ad';
 import {AdStatusDetails} from '@/models/ad-status-details';
 
@@ -61,10 +63,26 @@ export const adminAdsApi = createApi({
         // Get Daily Revenue
         getDailyRevenue: builder.query<RevenueDto, void>({
             query: () => ({
-                url: '/admin/ads//revenue/daily-summary',
+                url: '/admin/ads/revenue/daily-summary',
                 method: 'GET',
             }),
-            providesTags: ['AdminAds'], // Using AdminAds tag for now
+            providesTags: ['AdminAds'],
+        }),
+        // Get Monthly Revenue
+        getMonthlyRevenue: builder.query<MonthlyRevenueResponseDto, void>({
+            query: () => ({
+                url: '/admin/ads/revenue/monthly',
+                method: 'GET',
+            }),
+            providesTags: ['AdminAds'],
+        }),
+        // Get Weekly Revenue
+        getWeeklyRevenue: builder.query<WeeklyRevenueResponseDto, void>({
+            query: () => ({
+                url: '/admin/ads/revenue/weekly',
+                method: 'GET',
+            }),
+            providesTags: ['AdminAds'],
         }),
         // Get Ad By ID (Admin)
         getAdById: builder.query<AdStatusDetails, number>({
@@ -109,6 +127,8 @@ export const {
     useGetAdStatusCountsQuery,
     useGetPurchasedAdsCountsQuery,
     useGetDailyRevenueQuery,
+    useGetMonthlyRevenueQuery,
+    useGetWeeklyRevenueQuery,
     useGetAdByIdQuery,
     useRejectAdMutation,
     useApproveAdMutation,

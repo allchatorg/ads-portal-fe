@@ -121,3 +121,21 @@ export interface RevenueDto {
     todayRevenue: number;
     yesterdayRevenue: number;
 }
+
+export interface MonthlyRevenueDto {
+    month: string;
+    revenue: number;
+}
+
+export interface MonthlyRevenueResponseDto {
+    data: MonthlyRevenueDto[];
+}
+
+export interface WeeklyRevenueDto {
+    day: string;
+    revenue: number;
+}
+
+export interface WeeklyRevenueResponseDto {
+    data: WeeklyRevenueDto[];
+}
