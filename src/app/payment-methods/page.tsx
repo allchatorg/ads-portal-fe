@@ -18,6 +18,7 @@ import { useGetPaymentMethodsQuery, useRemovePaymentMethodMutation } from "@/sto
 import { toast } from "sonner";
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_KEY || '';
+console.log("KEY" + publishableKey);
 const isStripeKeyValid = publishableKey.startsWith('pk_');
 if (!isStripeKeyValid) {
     console.error(
