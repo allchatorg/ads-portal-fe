@@ -11,11 +11,28 @@ import {
     Users,
     Video,
 } from "lucide-react"
-import { AdFormatType } from "@/data/adFormats"
-import { useGetAdFormatsQuery } from "@/store/services/adFormatsApi"
 
 export default function Home() {
-    const { data: adFormats = [] } = useGetAdFormatsQuery()
+    const adFormats = [
+        {
+            id: 1,
+            type: "TEXT",
+            title: "Text Advertisement",
+            description: "Simple text-based advertisement",
+        },
+        {
+            id: 2,
+            type: "PHOTO",
+            title: "Display / Photo Ad",
+            description: "High-visibility visual format",
+        },
+        {
+            id: 3,
+            type: "VIDEO",
+            title: "Video Ad",
+            description: "Engaging video content",
+        },
+    ]
 
     return (
         <div className="min-h-screen w-full bg-[#E0EEFF] overflow-hidden relative selection:bg-blue-200">
@@ -45,18 +62,14 @@ export default function Home() {
 
                     <div className="mt-10 flex w-full flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
                         <Link href="/auth?view=register" className="w-full sm:w-auto">
-                            <button
-                                className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-md transition-all duration-200 hover:bg-blue-700 active:scale-95"
-                            >
+                            <button className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-md transition-all duration-200 hover:bg-blue-700 active:scale-95">
                                 Create Ad Account
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </button>
                         </Link>
 
                         <Link href="/auth?view=login" className="w-full sm:w-auto">
-                            <button
-                                className="w-full inline-flex items-center justify-center rounded-xl border border-white/60 bg-white/50 backdrop-blur-sm px-8 py-4 text-base font-bold text-slate-900 shadow-sm transition-all duration-200 hover:bg-white/80 active:scale-95"
-                            >
+                            <button className="w-full inline-flex items-center justify-center rounded-xl border border-white/60 bg-white/50 backdrop-blur-sm px-8 py-4 text-base font-bold text-slate-900 shadow-sm transition-all duration-200 hover:bg-white/80 active:scale-95">
                                 Log in
                             </button>
                         </Link>
@@ -71,13 +84,13 @@ export default function Home() {
                             {adFormats.map((format) => {
                                 let Icon = FileText
                                 switch (format.type) {
-                                    case AdFormatType.TEXT:
+                                    case "TEXT":
                                         Icon = MessageSquare
                                         break
-                                    case AdFormatType.PHOTO:
+                                    case "PHOTO":
                                         Icon = ImageIcon
                                         break
-                                    case AdFormatType.VIDEO:
+                                    case "VIDEO":
                                         Icon = Video
                                         break
                                 }
@@ -88,12 +101,8 @@ export default function Home() {
                                         href={`/campaign?formatId=${format.id}`}
                                         className="block h-full"
                                     >
-                                        <div
-                                            className="group relative h-full rounded-3xl bg-white p-6 shadow-lg border border-gray-200 flex flex-col items-start transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl"
-                                        >
-                                            <div
-                                                className="mb-4 inline-flex items-center justify-center rounded-xl bg-blue-100 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200"
-                                            >
+                                        <div className="group relative h-full rounded-3xl bg-white p-6 shadow-lg border border-gray-200 flex flex-col items-start transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
+                                            <div className="mb-4 inline-flex items-center justify-center rounded-xl bg-blue-100 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
                                                 <Icon className="h-6 w-6" />
                                             </div>
                                             <h3 className="text-xl font-semibold text-slate-900 mb-2">
