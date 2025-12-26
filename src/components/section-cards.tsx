@@ -58,7 +58,7 @@ export function SectionCards({statusCounts, isLoading}: SectionCardsProps) {
             <CompletionCard
                 title="Completed Ads"
                 current={isLoading ? 0 : completedCount}
-                total={totalAds || 1}
+                total={totalAds || 0}
                 description={`${completedCount} ads have completed`}
             />
         </div>

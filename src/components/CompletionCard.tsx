@@ -11,7 +11,7 @@ interface CompletionCardProps {
 }
 
 export function CompletionCard({title, current, total, description, showPercentage = true}: CompletionCardProps) {
-    const percentage = Math.round((current / total) * 100);
+    const percentage = (current && total && Math.round((current / total) * 100)) || 0;
     const isComplete = current >= total;
 
     return (

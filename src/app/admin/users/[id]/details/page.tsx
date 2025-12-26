@@ -75,7 +75,7 @@ export default function UserDetailsPage() {
                             <p className="text-sm text-muted-foreground mt-1">Total Ads Purchased</p>
                         </div>
                         <div className="flex flex-col items-center justify-center p-6 border rounded-lg">
-                            <p className="text-3xl font-bold text-green-600">${user.totalSpent.toFixed(2)}</p>
+                            <p className="text-3xl font-bold text-green-600">${(user.totalSpent && user.totalSpent.toFixed(2))}</p>
                             <p className="text-sm text-muted-foreground mt-1">Total Spent</p>
                         </div>
                     </div>

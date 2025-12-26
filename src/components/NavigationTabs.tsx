@@ -15,8 +15,8 @@ interface NavigationTabsProps {
 export function NavigationTabs({
     tabs,
     activeValue,
-    className = "flex h-full w-full flex-col",
-    tabsListClassName = "grid w-full rounded-none border-b h-12 bg-transparent p-0 flex-shrink-0",
+    className = "flex h-full w-full ",
+    tabsListClassName = "flex w-full rounded-none border-b h-12 bg-transparent p-0 flex-shrink-0",
     tabTriggerClassName = "rounded-none border-b-2 data-[state=active]:border-blue-600 overflow-hidden",
     children
 }: NavigationTabsProps) {
