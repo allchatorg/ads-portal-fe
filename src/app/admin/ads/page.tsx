@@ -1,16 +1,16 @@
 "use client"
-import {Suspense, useState} from 'react';
-import {SiteHeader} from "@/components/site-header";
-import {AdsTable} from "@/components/ads-table";
-import {useAdsParams} from "@/hooks/use-ads-params";
-import {useUser} from "@/hooks/use-user";
-import {UserRole} from "@/models/user-role";
-import {useGetAdStatusCountsQuery, useSearchAdsQuery} from "@/store/services/adminAdsApi";
-import {AdFormatType, AdStatus} from "@/models/ad";
-import {useDebounce} from "@/hooks/useDebounce";
+import { Suspense, useMemo, useState } from 'react';
+import { SiteHeader } from "@/components/site-header";
+import { AdsTable } from "@/components/ads-table";
+import { useAdsParams } from "@/hooks/use-ads-params";
+import { useUser } from "@/hooks/use-user";
+import { UserRole } from "@/models/user-role";
+import { useGetAdStatusCountsQuery, useSearchAdsQuery } from "@/store/services/adminAdsApi";
+import { AdFormatType, AdStatus } from "@/models/ad";
+import { useDebounce } from "@/hooks/useDebounce";
 
 function AdminAdsPageContent() {
-    const {user} = useUser();
+    const { user } = useUser();
     const {
         status,
         type,
@@ -35,6 +35,17 @@ function AdminAdsPageContent() {
     // Debounced search value
     const debouncedSearch = useDebounce(localSearch)
 
+    // Parse search query to determine if it's a User ID or Email
+    const { userId, email } = useMemo(() => {
+        if (!debouncedSearch) return { userId: undefined, email: undefined }
+
+        const isNumeric = /^\d+$/.test(debouncedSearch)
+        if (isNumeric) {
+            return { userId: parseInt(debouncedSearch), email: undefined }
+        }
+        return { userId: undefined, email: debouncedSearch }
+    }, [debouncedSearch])
+
     // Convert sort string to backend format
     const sortParam = sort ? (() => {
         const [field, direction] = sort.split(',');
@@ -44,7 +55,7 @@ function AdminAdsPageContent() {
         }]);
     })() : undefined;
 
-    const {data} = useSearchAdsQuery({
+    const { data } = useSearchAdsQuery({
         status: status && status !== 'null' ? (status as AdStatus) : undefined,
         types: type && type !== 'null' ? [type as AdFormatType] : undefined,
         sort: sortParam,
@@ -52,10 +63,11 @@ function AdminAdsPageContent() {
         size,
         approvedAtStart: startDate ? startDate.toISOString() : undefined,
         approvedAtEnd: endDate ? endDate.toISOString() : undefined,
-        email: debouncedSearch && debouncedSearch !== 'null' ? debouncedSearch : undefined,
+        userId,
+        email,
     });
 
-    const {data: statusCountsData} = useGetAdStatusCountsQuery();
+    const { data: statusCountsData } = useGetAdStatusCountsQuery();
 
     // Calculate counts from status counts API
     const counts = {
@@ -101,7 +113,7 @@ export default function AdminAdsPage() {
                 description="Manage and review all platform advertisements"
             />
             <Suspense fallback={<div>Loading...</div>}>
-                <AdminAdsPageContent/>
+                <AdminAdsPageContent />
             </Suspense>
         </div>
     );
