@@ -1,13 +1,13 @@
 "use client"
 
-import {IconLogout} from "@tabler/icons-react"
-import {Avatar, AvatarFallback, AvatarImage,} from "@/components/ui/avatar"
-import {SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar"
+import { IconLogout } from "@tabler/icons-react"
+import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar"
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar"
 
 export function NavUser({
-                            user,
-                            onLogout,
-                        }: {
+    user,
+    onLogout,
+}: {
     user: {
         name: string
         email: string
@@ -15,25 +15,41 @@ export function NavUser({
     }
     onLogout?: () => void
 }) {
+    // Extract initials from user name
+    const getInitials = (name: string) => {
+        const nameParts = name.trim().split(' ')
+        if (nameParts.length === 1) {
+            return nameParts[0].substring(0, 2).toUpperCase()
+        }
+        return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+    }
+
+    const initials = getInitials(user.name)
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton
                     size="lg"
-                    onClick={onLogout}
                     className="flex items-center gap-2"
                 >
                     <Avatar className="h-8 w-8 rounded-lg grayscale">
-                        <AvatarImage src={user.avatar} alt={user.name}/>
-                        <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-medium">{user.name}</span>
                         <span className="text-muted-foreground truncate text-xs">
-              {user.email}
-            </span>
+                            {user.email}
+                        </span>
                     </div>
-                    <IconLogout className="cursor-pointer ml-auto w-4 h-4"/>
+                    <IconLogout
+                        className="cursor-pointer ml-auto w-4 h-4"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onLogout?.();
+                        }}
+                    />
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

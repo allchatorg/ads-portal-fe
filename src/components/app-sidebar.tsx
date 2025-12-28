@@ -1,23 +1,17 @@
 "use client"
 
 import * as React from "react"
-import {IconChartBar, IconCreditCard, IconDashboard, IconListDetails, IconUser, IconUsers} from "@tabler/icons-react"
-import {NavMain} from "@/components/nav-main"
-import {NavSecondary} from "@/components/nav-secondary"
-import {NavUser} from "@/components/nav-user"
-import {Sidebar, SidebarContent, SidebarFooter, SidebarHeader,} from "@/components/ui/sidebar"
-import {useUser} from "@/hooks/use-user"
-import {UserRole} from "@/models/user-role"
-import {useLogoutMutation} from "@/store/services/userApi"
-import {useAppDispatch} from "@/store/hooks"
-import {clearUser} from "@/store/slices/authSlice"
-import {useRouter} from "next/navigation"
-
-const userData = {
-    name: "allchat",
-    email: "allchat@example.com",
-    avatar: "/avatars/shadcn.jpg",
-}
+import { IconChartBar, IconCreditCard, IconDashboard, IconListDetails, IconUser, IconUsers } from "@tabler/icons-react"
+import { NavMain } from "@/components/nav-main"
+import { NavSecondary } from "@/components/nav-secondary"
+import { NavUser } from "@/components/nav-user"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, } from "@/components/ui/sidebar"
+import { useUser } from "@/hooks/use-user"
+import { UserRole } from "@/models/user-role"
+import { useLogoutMutation } from "@/store/services/userApi"
+import { useAppDispatch } from "@/store/hooks"
+import { clearUser } from "@/store/slices/authSlice"
+import { useRouter } from "next/navigation"
 
 const regularUserNavMain = [
     {
@@ -76,8 +70,8 @@ const adminNavSecondary = [
     }
 ]
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
-    const {user} = useUser()
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { user } = useUser()
     const isAdmin = user.role === UserRole.ADMIN
 
     const [logout] = useLogoutMutation()
@@ -111,12 +105,16 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 </div>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={navMain}/>
-                <NavSecondary items={navSecondary} className="mt-auto"/>
+                <NavMain items={navMain} />
+                <NavSecondary items={navSecondary} className="mt-auto" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavUser user={userData} onLogout={handleLogout}/>
+                <NavUser user={{
+                    name: user.name,
+                    email: user.email,
+                    avatar: "/avatars/shadcn.jpg",
+                }} onLogout={handleLogout} />
             </SidebarFooter>
         </Sidebar>
     )
