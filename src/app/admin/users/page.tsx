@@ -5,6 +5,7 @@ import {SiteHeader} from "@/components/site-header"
 import {UsersTable} from "@/components/users-table"
 import {useUsersParams} from "@/hooks/use-users-params"
 import {sortParamsToQueryString} from "@/lib/utils"
+import {useDebounce} from "@/hooks/useDebounce"
 
 function AdminUsersPageContent() {
     const [page, setPage] = useState(0)
@@ -18,16 +19,22 @@ function AdminUsersPageContent() {
         clearParams
     } = useUsersParams()
 
+    // Local search state for immediate UI updates
+    const [localSearch, setLocalSearch] = useState(searchQuery || "")
+
+    // Debounced search value
+    const debouncedSearch = useDebounce(localSearch)
+
     // Parse search query to determine if it's a User ID or Email
     const {userId, email} = useMemo(() => {
-        if (!searchQuery) return {userId: undefined, email: undefined}
+        if (!debouncedSearch) return {userId: undefined, email: undefined}
 
-        const isNumeric = /^\d+$/.test(searchQuery)
+        const isNumeric = /^\d+$/.test(debouncedSearch)
         if (isNumeric) {
-            return {userId: parseInt(searchQuery), email: undefined}
+            return {userId: parseInt(debouncedSearch), email: undefined}
         }
-        return {userId: undefined, email: searchQuery}
-    }, [searchQuery])
+        return {userId: undefined, email: debouncedSearch}
+    }, [debouncedSearch])
 
     const formattedSort = useMemo(() => {
         if (!sort) return undefined
@@ -55,9 +62,12 @@ function AdminUsersPageContent() {
                 users={users}
                 sort={sort}
                 onSortChange={setSort}
-                searchQuery={searchQuery}
-                onSearchQueryChange={setSearchQuery}
-                onClearFilters={clearParams}
+                searchQuery={localSearch}
+                onSearchQueryChange={setLocalSearch}
+                onClearFilters={() => {
+                    setLocalSearch("")
+                    clearParams()
+                }}
                 page={page}
                 totalPages={totalPages}
                 onPageChange={setPage}
