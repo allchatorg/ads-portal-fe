@@ -48,7 +48,7 @@ export function useAdsParams() {
 
     const status = searchParams.get("status")
     const type = searchParams.get("type")
-    const sort = searchParams.get("sort") || "submittedDate,desc" // Changed default to new field
+    const sort = searchParams.get("sort") || "submittedAt,desc"
     const page = parseInt(searchParams.get("page") || "0", 10)
     const size = parseInt(searchParams.get("size") || "10", 10)
 

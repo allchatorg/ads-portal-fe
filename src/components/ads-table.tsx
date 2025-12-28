@@ -91,10 +91,10 @@ export function AdsTable({
     const toggleSort = () => {
         if (!onSortChange || !sort) return
         const [field, order] = sort.split(",")
-        if (field === "submittedDate") {
-            onSortChange(`submittedDate,${order === "asc" ? "desc" : "asc"}`)
+        if (field === "submittedAt") {
+            onSortChange(`submittedAt,${order === "asc" ? "desc" : "asc"}`)
         } else {
-            onSortChange("submittedDate,desc")
+            onSortChange("submittedAt,desc")
         }
     }
 

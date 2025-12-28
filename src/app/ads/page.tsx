@@ -1,15 +1,15 @@
 "use client"
-import {Suspense} from 'react';
-import {SiteHeader} from "@/components/site-header";
-import {AdsTable} from "@/components/ads-table";
-import {useAdsParams} from "@/hooks/use-ads-params";
-import {useUser} from "@/hooks/use-user";
-import {UserRole} from "@/models/user-role";
-import {useGetAdStatusCountsByUserQuery, useSearchAdsQuery} from "@/store/services/adsApi";
-import {AdFormatType, AdStatus} from "@/models/ad";
+import { Suspense } from 'react';
+import { SiteHeader } from "@/components/site-header";
+import { AdsTable } from "@/components/ads-table";
+import { useAdsParams } from "@/hooks/use-ads-params";
+import { useUser } from "@/hooks/use-user";
+import { UserRole } from "@/models/user-role";
+import { useGetAdStatusCountsByUserQuery, useSearchAdsQuery } from "@/store/services/adsApi";
+import { AdFormatType, AdStatus } from "@/models/ad";
 
 function AdsPageContent() {
-    const {user} = useUser();
+    const { user } = useUser();
     const {
         status,
         type,
@@ -28,11 +28,20 @@ function AdsPageContent() {
         clearParams
     } = useAdsParams();
 
+    // Convert sort string to backend format
+    const sortParam = sort ? (() => {
+        const [field, direction] = sort.split(',');
+        return JSON.stringify([{
+            field,
+            direction: direction.toUpperCase()
+        }]);
+    })() : undefined;
+
     // For regular users, enforce userId to match authenticated user
-    const {data} = useSearchAdsQuery({
+    const { data } = useSearchAdsQuery({
         status: status && status !== 'null' ? (status as AdStatus) : undefined,
         types: type && type !== 'null' ? [type as AdFormatType] : undefined,
-        sort,
+        sort: sortParam,
         page,
         size,
         // For regular users, always include their userId (backend enforces this)
@@ -42,7 +51,7 @@ function AdsPageContent() {
     });
 
     // Use user-specific counts for regular users, all counts for admins
-    const {data: statusCountsData} = useGetAdStatusCountsByUserQuery()
+    const { data: statusCountsData } = useGetAdStatusCountsByUserQuery()
 
     // Calculate counts from status counts API
     const counts = {
@@ -85,7 +94,7 @@ export default function AdsPage() {
                 description="Manage your ad campaigns"
             />
             <Suspense fallback={<div>Loading...</div>}>
-                <AdsPageContent/>
+                <AdsPageContent />
             </Suspense>
         </div>
     );

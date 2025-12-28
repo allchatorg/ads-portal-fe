@@ -1,23 +1,30 @@
 "use client";
-import {useParams} from "next/navigation";
-import {useMemo, useState} from "react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {AdsTable} from "@/components/ads-table";
-import {useGetUserByIdQuery} from "@/store/services/adminUsersApi";
-import {useGetAdStatusCountsByUserIdQuery, useSearchAdsQuery} from "@/store/services/adminAdsApi";
-import {AdStatus} from "@/models/ad";
+import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdsTable } from "@/components/ads-table";
+import { useGetUserByIdQuery } from "@/store/services/adminUsersApi";
+import { useGetAdStatusCountsByUserIdQuery, useSearchAdsQuery } from "@/store/services/adminAdsApi";
+import { AdStatus } from "@/models/ad";
 
 export default function UserAdsPage() {
     const params = useParams();
     const userId = Number(params.id);
     const [status, setStatus] = useState<string | null>(null);
     const [type, setType] = useState<string | null>(null);
-    const [sort, setSort] = useState<string>("submittedDate,desc");
+    const [sort, setSort] = useState<string>("submittedAt,desc");
     const [page] = useState<number>(0);
     const [size] = useState<number>(100); // Large page size to get all user ads
 
-    // Fetch user details
-    const {data: user, isLoading: isUserLoading, error: userError} = useGetUserByIdQuery(userId);
+    const { data: user, isLoading: isUserLoading, error: userError } = useGetUserByIdQuery(userId);
+
+    const sortParam = sort ? (() => {
+        const [field, direction] = sort.split(',');
+        return JSON.stringify([{
+            field,
+            direction: direction.toUpperCase()
+        }]);
+    })() : undefined;
 
     // Fetch user's ads
     const {
@@ -26,10 +33,10 @@ export default function UserAdsPage() {
         error: adsError
     } = useSearchAdsQuery({
         userId,
-        ...(status && {status: status as AdStatus}),
+        ...(status && { status: status as AdStatus }),
         page,
         size,
-        sort,
+        sort: sortParam,
     });
 
     // Fetch status counts (these remain fixed regardless of filters)

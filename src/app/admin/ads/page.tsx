@@ -1,15 +1,15 @@
 "use client"
-import {Suspense} from 'react';
-import {SiteHeader} from "@/components/site-header";
-import {AdsTable} from "@/components/ads-table";
-import {useAdsParams} from "@/hooks/use-ads-params";
-import {useUser} from "@/hooks/use-user";
-import {UserRole} from "@/models/user-role";
-import {useGetAdStatusCountsQuery, useSearchAdsQuery} from "@/store/services/adminAdsApi";
-import {AdFormatType, AdStatus} from "@/models/ad";
+import { Suspense } from 'react';
+import { SiteHeader } from "@/components/site-header";
+import { AdsTable } from "@/components/ads-table";
+import { useAdsParams } from "@/hooks/use-ads-params";
+import { useUser } from "@/hooks/use-user";
+import { UserRole } from "@/models/user-role";
+import { useGetAdStatusCountsQuery, useSearchAdsQuery } from "@/store/services/adminAdsApi";
+import { AdFormatType, AdStatus } from "@/models/ad";
 
 function AdminAdsPageContent() {
-    const {user} = useUser();
+    const { user } = useUser();
     const {
         status,
         type,
@@ -28,10 +28,19 @@ function AdminAdsPageContent() {
         clearParams
     } = useAdsParams();
 
-    const {data} = useSearchAdsQuery({
+    // Convert sort string to backend format
+    const sortParam = sort ? (() => {
+        const [field, direction] = sort.split(',');
+        return JSON.stringify([{
+            field,
+            direction: direction.toUpperCase()
+        }]);
+    })() : undefined;
+
+    const { data } = useSearchAdsQuery({
         status: status && status !== 'null' ? (status as AdStatus) : undefined,
         types: type && type !== 'null' ? [type as AdFormatType] : undefined,
-        sort,
+        sort: sortParam,
         page,
         size,
         approvedAtStart: startDate ? startDate.toISOString() : undefined,
@@ -39,7 +48,7 @@ function AdminAdsPageContent() {
         email: searchQuery && searchQuery !== 'null' ? searchQuery : undefined,
     });
 
-    const {data: statusCountsData} = useGetAdStatusCountsQuery();
+    const { data: statusCountsData } = useGetAdStatusCountsQuery();
 
     // Calculate counts from status counts API
     const counts = {
@@ -82,7 +91,7 @@ export default function AdminAdsPage() {
                 description="Manage and review all platform advertisements"
             />
             <Suspense fallback={<div>Loading...</div>}>
-                <AdminAdsPageContent/>
+                <AdminAdsPageContent />
             </Suspense>
         </div>
     );
