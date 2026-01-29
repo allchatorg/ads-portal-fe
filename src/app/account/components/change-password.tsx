@@ -77,17 +77,9 @@ export const ChangePassword: React.FC<ChangePasswordProps> = ({onChangePassword,
                             type="password"
                             {...register('newPassword', {
                                 required: 'Password is required',
-                                minLength: {
-                                    value: 8,
-                                    message: 'Password must be at least 8 characters long'
-                                },
-                                maxLength: {
-                                    value: 32,
-                                    message: 'Password must be at most 32 characters long'
-                                },
                                 pattern: {
-                                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
-                                    message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                                    value: /^[^\s\x00-\x1F\x7F]{8,128}$/,
+                                    message: 'Password must be between 8 and 128 characters and contain no whitespace'
                                 }
                             })}
                             placeholder="Enter new password"
