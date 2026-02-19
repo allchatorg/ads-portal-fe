@@ -52,7 +52,7 @@ export default function Home() {
                     <div className="text-center max-w-4xl">
                         <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
                             Grow your business on <br className="hidden sm:block" />
-                            <span className="text-blue-600">AllChat</span>
+                            <span className="text-blue-600">allchat</span>
                         </h1>
                         <p className="mt-6 text-lg text-slate-700 sm:text-xl leading-relaxed max-w-2xl mx-auto">
                             Launch high-conversion campaigns in minutes. Reach users directly in their conversations

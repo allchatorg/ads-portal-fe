@@ -95,7 +95,7 @@ export function RegisterForm({
 
             // Redirect to ads page after successful registration
             setTimeout(() => {
-                router.push("/ads");
+                router.push("/campaign");
             }, 1500);
         } catch (err) {
             // Error is handled by RTK Query and displayed below
