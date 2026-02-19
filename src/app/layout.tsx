@@ -3,6 +3,8 @@ import "./globals.css";
 import { ConditionalLayout } from "@/components/conditional-layout";
 import { StoreProvider } from "@/store/StoreProvider";
 import localFont from "next/font/local";
+import { DialogProvider } from "@/components/providers/DialogProvider";
+import { Footer } from "@/components/Footer";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -27,8 +29,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (

@@ -13,6 +13,10 @@ import { useRegisterMutation } from "@/store/services/userApi";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useDialog } from "@/components/providers/DialogProvider";
+import TermsOfService from "@/components/TermsOfService";
+import PrivacyPolicy from "@/components/PrivacyPolicy";
+import AdvertiserTerms from "@/components/AdvertiserPolicy";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -214,6 +218,59 @@ export function RegisterForm({
                                         </div>
                                     </div>
                                 )}
+                            />
+
+                            <Controller
+                                control={control}
+                                name="acceptsPolicies"
+                                rules={{ required: "You must accept the policies to register" }}
+                                render={({ field }) => (
+                                    <>
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox
+                                                id="acceptsPolicies"
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                            <Label
+                                                htmlFor="acceptsPolicies"
+                                                className="cursor-pointer text-sm leading-relaxed flex flex-wrap items-center gap-x-1 gap-y-0.5"
+                                            >
+
+                                                <span>I accept the</span>
+                                                <button type="button" onClick={(e) => {
+                                                    e.preventDefault();
+                                                    open(<div className="max-w-4xl"><TermsOfService /></div>);
+                                                }}
+                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Terms
+                                                    of Service,
+                                                </button>
+                                                <button type="button" onClick={(e) => {
+                                                    e.preventDefault();
+                                                    open(<div className="max-w-4xl"><PrivacyPolicy /></div>);
+                                                }}
+                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Privacy
+                                                    Policy
+                                                </button>
+                                                {" "}and{" "}
+                                                <button type="button" onClick={(e) => {
+                                                    e.preventDefault();
+                                                    open(<div className="max-w-4xl"><AdvertiserTerms /></div>);
+                                                }}
+                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Advertiser
+                                                    Terms
+                                                </button>
+                                            </Label>
+                                        </div>
+                                        {errors.acceptsPolicies && (
+                                            <p className="text-sm text-red-500 pl-6">
+                                                {errors.acceptsPolicies.message}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+                        </div>
 
                         {apiError && (
                             <Alert variant="destructive">
