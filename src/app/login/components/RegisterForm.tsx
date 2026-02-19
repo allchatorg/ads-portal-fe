@@ -1,17 +1,18 @@
 "use client";
-import {useForm} from "react-hook-form";
-import {cn} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
-import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {useState} from "react";
-import {AlertTriangle, CheckCircle2} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {useRegisterMutation} from "@/store/services/userApi";
-import {useAppDispatch} from "@/store/hooks";
-import {setUser} from "@/store/slices/authSlice";
+import { Controller, useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRegisterMutation } from "@/store/services/userApi";
+import { useAppDispatch } from "@/store/hooks";
+import { setUser } from "@/store/slices/authSlice";
+import { Checkbox } from "@/components/ui/checkbox";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -24,25 +25,29 @@ interface RegisterFormData {
     email: string;
     password: string;
     confirmPassword: string;
+    isOver18: boolean;
+    acceptsPolicies: boolean;
 }
 
 export function RegisterForm({
-                                 className,
-                                 onAuthViewChange,
-                                 ...props
-                             }: React.ComponentPropsWithoutRef<"div"> & {
+    className,
+    onAuthViewChange,
+    ...props
+}: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const [success, setSuccess] = useState<string | null>(null);
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [registerUser, {isLoading, error: apiError}] = useRegisterMutation();
+    const [registerUser, { isLoading, error: apiError }] = useRegisterMutation();
+    const { open } = useDialog();
 
     const {
         register: formRegister,
+        control,
         handleSubmit,
         watch,
-        formState: {errors},
+        formState: { errors },
         reset,
     } = useForm<RegisterFormData>({
         defaultValues: {
@@ -51,6 +56,8 @@ export function RegisterForm({
             email: "",
             password: "",
             confirmPassword: "",
+            isOver18: false,
+            acceptsPolicies: false,
         },
     });
 
@@ -61,7 +68,7 @@ export function RegisterForm({
 
         try {
             // Remove confirmPassword before sending to API
-            const {confirmPassword: _, ...registerData} = data;
+            const { confirmPassword: _, ...registerData } = data;
 
             const response = await registerUser(registerData).unwrap();
 
@@ -182,9 +189,35 @@ export function RegisterForm({
                             )}
                         </div>
 
+                        <div className="grid gap-4">
+                            <Controller
+                                control={control}
+                                name="isOver18"
+                                rules={{ required: "You must be 18 or older to register" }}
+                                render={({ field }) => (
+                                    <div className="flex items-start space-x-2">
+                                        <Checkbox
+                                            id="isOver18"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        <div className="grid gap-1.5 leading-none">
+                                            <Label
+                                                htmlFor="isOver18"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                I am over 18
+                                            </Label>
+                                            {errors.isOver18 && (
+                                                <p className="text-sm text-red-500">{errors.isOver18.message}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4"/>
+                                <AlertTriangle className="h-4 w-4" />
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)
@@ -195,7 +228,7 @@ export function RegisterForm({
 
                         {success && (
                             <Alert className="border-green-500 bg-green-50 text-green-900">
-                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
                                 <AlertDescription className="m-0 p-0 text-green-900">
                                     {success}
                                 </AlertDescription>

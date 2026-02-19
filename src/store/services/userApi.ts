@@ -1,5 +1,5 @@
-import {createApi} from '@reduxjs/toolkit/query/react';
-import {baseQuery} from './baseQuery';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 // Role enum matching backend
 export enum Role {
@@ -30,6 +30,8 @@ export interface RegisterRequest {
     lastName: string;
     email: string;
     password: string;
+    isOver18: boolean;
+    acceptsPolicies: boolean;
 }
 
 // Forgot password request
@@ -162,7 +164,7 @@ export const userApi = createApi({
         // Get user by ID
         getUserById: builder.query<User, string>({
             query: (id) => `/users/${id}`,
-            providesTags: (result, error, id) => [{type: 'User', id}],
+            providesTags: (result, error, id) => [{ type: 'User', id }],
         }),
 
         // Get all users (admin only)
@@ -171,20 +173,20 @@ export const userApi = createApi({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.map(({id}) => ({type: 'User' as const, id: id.toString()})),
-                        {type: 'User', id: 'LIST'},
+                        ...result.map(({ id }) => ({ type: 'User' as const, id: id.toString() })),
+                        { type: 'User', id: 'LIST' },
                     ]
-                    : [{type: 'User', id: 'LIST'}],
+                    : [{ type: 'User', id: 'LIST' }],
         }),
 
         // Update user
         updateUser: builder.mutation<User, Partial<User> & { id: number }>({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `/users/${id}`,
                 method: 'PATCH',
                 body: patch,
             }),
-            invalidatesTags: (result, error, {id}) => [{type: 'User', id: id.toString()}],
+            invalidatesTags: (result, error, { id }) => [{ type: 'User', id: id.toString() }],
         }),
 
         // Delete user
@@ -193,7 +195,7 @@ export const userApi = createApi({
                 url: `/users/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id) => [{type: 'User', id: id.toString()}],
+            invalidatesTags: (result, error, id) => [{ type: 'User', id: id.toString() }],
         }),
 
         // Send verification email
@@ -247,7 +249,7 @@ export const userApi = createApi({
             query: (data) => ({
                 url: '/auth/marketing-preferences',
                 method: 'PATCH',
-                body: {subscribedToMarketingEmails: data.subscribedToMarketingEmails},
+                body: { subscribedToMarketingEmails: data.subscribedToMarketingEmails },
             }),
             invalidatesTags: ['User'],
         }),
