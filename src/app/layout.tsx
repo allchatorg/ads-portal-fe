@@ -35,15 +35,18 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF]`}
-        >
-        <StoreProvider>
-            <ConditionalLayout>
-                {children}
-            </ConditionalLayout>
-        </StoreProvider>
-        </body>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF] pb-10`}
+            >
+                <StoreProvider>
+                    <DialogProvider>
+                        <ConditionalLayout>
+                            {children}
+                        </ConditionalLayout>
+                        <Footer />
+                    </DialogProvider>
+                </StoreProvider>
+            </body>
         </html>
     );
 }
