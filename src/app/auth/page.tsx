@@ -40,8 +40,8 @@ const AuthPageContent: React.FC = () => {
 
     return (
         <AuthRoute>
-            <div className="flex h-full min-h-screen items-center justify-center">
-                <div className="flex flex-col items-center gap-8 min-w-[450px] max-w-[450px]">
+            <div className="flex h-full min-h-screen items-center justify-center p-4 md:p-8">
+                <div className="flex flex-col items-center gap-8 w-full max-w-[450px]">
                     <Card className="pt-6 w-full">
                         <motion.div
                             initial={{opacity: 0, y: -20}}

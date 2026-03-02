@@ -1,17 +1,32 @@
 "use client"
 
 import * as React from "react"
-import { IconChartBar, IconCreditCard, IconDashboard, IconListDetails, IconUser, IconUsers } from "@tabler/icons-react"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, } from "@/components/ui/sidebar"
-import { useUser } from "@/hooks/use-user"
-import { UserRole } from "@/models/user-role"
-import { useLogoutMutation } from "@/store/services/userApi"
-import { useAppDispatch } from "@/store/hooks"
-import { clearUser } from "@/store/slices/authSlice"
-import { useRouter } from "next/navigation"
+import {
+    IconBook,
+    IconBriefcase,
+    IconChartBar,
+    IconCreditCard,
+    IconDashboard,
+    IconListDetails,
+    IconShield,
+    IconUser,
+    IconUsers
+} from "@tabler/icons-react"
+import {NavMain} from "@/components/nav-main"
+import {NavSecondary} from "@/components/nav-secondary"
+import {NavUser} from "@/components/nav-user"
+import {Sidebar, SidebarContent, SidebarFooter, SidebarHeader,} from "@/components/ui/sidebar"
+import {useUser} from "@/hooks/use-user"
+import {UserRole} from "@/models/user-role"
+import {useLogoutMutation} from "@/store/services/userApi"
+import {useAppDispatch} from "@/store/hooks"
+import {clearUser} from "@/store/slices/authSlice"
+import {useRouter} from "next/navigation"
+import {useDialog} from "@/components/providers/DialogProvider"
+import TermsOfService from "@/components/TermsOfService"
+import PrivacyPolicy from "@/components/PrivacyPolicy"
+import AdvertiserTerms from "@/components/AdvertiserPolicy"
+import {NavLegal} from "@/components/nav-legal"
 
 const regularUserNavMain = [
     {
@@ -70,13 +85,14 @@ const adminNavSecondary = [
     }
 ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { user } = useUser()
+export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+    const {user} = useUser()
     const isAdmin = user.role === UserRole.ADMIN
 
     const [logout] = useLogoutMutation()
     const dispatch = useAppDispatch()
     const router = useRouter()
+    const {open} = useDialog()
 
     const handleLogout = async () => {
         try {
@@ -93,6 +109,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navMain = isAdmin ? adminNavMain : regularUserNavMain
     const navSecondary = isAdmin ? adminNavSecondary : regularUserNavSecondary
 
+    const legalItems = [
+        {
+            title: "Terms of Service",
+            icon: IconBook,
+            onClick: () => open(<div className="max-w-4xl"><TermsOfService/></div>)
+        },
+        {
+            title: "Privacy Policy",
+            icon: IconShield,
+            onClick: () => open(<div className="max-w-4xl"><PrivacyPolicy/></div>)
+        },
+        {
+            title: "Advertiser Terms",
+            icon: IconBriefcase,
+            onClick: () => open(<div className="max-w-4xl"><AdvertiserTerms/></div>)
+        }
+    ]
+
     return (
         <Sidebar className={'rounded-xl'} collapsible="offcanvas" {...props}>
             <SidebarHeader>
@@ -105,8 +139,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={navMain} />
-                <NavSecondary items={navSecondary} className="mt-auto" />
+                <NavMain items={navMain}/>
+                <NavLegal items={legalItems}/>
+                <NavSecondary items={navSecondary} className="mt-auto"/>
             </SidebarContent>
 
             <SidebarFooter>
@@ -114,7 +149,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     name: user.name,
                     email: user.email,
                     avatar: "/avatars/shadcn.jpg",
-                }} onLogout={handleLogout} />
+                }} onLogout={handleLogout}/>
             </SidebarFooter>
         </Sidebar>
     )
