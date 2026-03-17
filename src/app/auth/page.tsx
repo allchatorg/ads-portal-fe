@@ -39,7 +39,7 @@ const AuthPageContent: React.FC = () => {
     };
 
     return (
-        <AuthRoute>
+        <AuthRoute redirectTo={view === AuthView.REGISTER ? "/campaign" : "/ads"}>
             <div className="flex h-full min-h-screen items-center justify-center p-4 md:p-8">
                 <div className="flex flex-col items-center gap-8 w-full max-w-[450px]">
                     <Card className="pt-6 w-full">
@@ -102,4 +102,3 @@ const AuthPage: React.FC = () => {
 };
 
 export default AuthPage;
-

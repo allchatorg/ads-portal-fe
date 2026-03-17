@@ -1,19 +1,19 @@
 "use client";
-import { Controller, useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRegisterMutation } from "@/store/services/userApi";
-import { useAppDispatch } from "@/store/hooks";
-import { setUser } from "@/store/slices/authSlice";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useDialog } from "@/components/providers/DialogProvider";
+import {Controller, useForm} from "react-hook-form";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {useState} from "react";
+import {AlertTriangle, CheckCircle2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {useRegisterMutation} from "@/store/services/userApi";
+import {useAppDispatch} from "@/store/hooks";
+import {setUser} from "@/store/slices/authSlice";
+import {Checkbox} from "@/components/ui/checkbox";
+import {useDialog} from "@/components/providers/DialogProvider";
 import TermsOfService from "@/components/TermsOfService";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
 import AdvertiserTerms from "@/components/AdvertiserPolicy";
@@ -34,24 +34,24 @@ interface RegisterFormData {
 }
 
 export function RegisterForm({
-    className,
-    onAuthViewChange,
-    ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
+                                 className,
+                                 onAuthViewChange,
+                                 ...props
+                             }: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const [success, setSuccess] = useState<string | null>(null);
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [registerUser, { isLoading, error: apiError }] = useRegisterMutation();
-    const { open } = useDialog();
+    const [registerUser, {isLoading, error: apiError}] = useRegisterMutation();
+    const {open} = useDialog();
 
     const {
         register: formRegister,
         control,
         handleSubmit,
         watch,
-        formState: { errors },
+        formState: {errors},
         reset,
     } = useForm<RegisterFormData>({
         defaultValues: {
@@ -72,7 +72,7 @@ export function RegisterForm({
 
         try {
             // Remove confirmPassword before sending to API
-            const { confirmPassword: _, ...registerData } = data;
+            const {confirmPassword: _, ...registerData} = data;
 
             const response = await registerUser(registerData).unwrap();
 
@@ -89,14 +89,9 @@ export function RegisterForm({
             }));
 
             // Registration successful
-            console.log("Registration successful:", response.message);
             setSuccess("Registration successful! Redirecting...");
             reset();
-
-            // Redirect to ads page after successful registration
-            setTimeout(() => {
-                router.push("/campaign");
-            }, 1500);
+            router.replace("/campaign");
         } catch (err) {
             // Error is handled by RTK Query and displayed below
             console.error("Registration failed:", err);
@@ -197,8 +192,8 @@ export function RegisterForm({
                             <Controller
                                 control={control}
                                 name="isOver18"
-                                rules={{ required: "You must be 18 or older to register" }}
-                                render={({ field }) => (
+                                rules={{required: "You must be 18 or older to register"}}
+                                render={({field}) => (
                                     <div className="flex items-start space-x-2">
                                         <Checkbox
                                             id="isOver18"
@@ -223,8 +218,8 @@ export function RegisterForm({
                             <Controller
                                 control={control}
                                 name="acceptsPolicies"
-                                rules={{ required: "You must accept the policies to register" }}
-                                render={({ field }) => (
+                                rules={{required: "You must accept the policies to register"}}
+                                render={({field}) => (
                                     <>
                                         <div className="flex items-center gap-2">
                                             <Checkbox
@@ -240,24 +235,24 @@ export function RegisterForm({
                                                 <span>I accept the</span>
                                                 <button type="button" onClick={(e) => {
                                                     e.preventDefault();
-                                                    open(<div className="max-w-4xl"><TermsOfService /></div>);
+                                                    open(<div className="max-w-4xl"><TermsOfService/></div>);
                                                 }}
-                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Terms
+                                                        className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Terms
                                                     of Service,
                                                 </button>
                                                 <button type="button" onClick={(e) => {
                                                     e.preventDefault();
-                                                    open(<div className="max-w-4xl"><PrivacyPolicy /></div>);
+                                                    open(<div className="max-w-4xl"><PrivacyPolicy/></div>);
                                                 }}
-                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Privacy
+                                                        className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Privacy
                                                     Policy
                                                 </button>
                                                 {" "}and{" "}
                                                 <button type="button" onClick={(e) => {
                                                     e.preventDefault();
-                                                    open(<div className="max-w-4xl"><AdvertiserTerms /></div>);
+                                                    open(<div className="max-w-4xl"><AdvertiserTerms/></div>);
                                                 }}
-                                                    className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Advertiser
+                                                        className="underline underline-offset-4 hover:text-primary whitespace-nowrap">Advertiser
                                                     Terms
                                                 </button>
                                             </Label>
@@ -274,7 +269,7 @@ export function RegisterForm({
 
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4"/>
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)
@@ -285,7 +280,7 @@ export function RegisterForm({
 
                         {success && (
                             <Alert className="border-green-500 bg-green-50 text-green-900">
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
                                 <AlertDescription className="m-0 p-0 text-green-900">
                                     {success}
                                 </AlertDescription>

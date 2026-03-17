@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import "./globals.css";
-import { ConditionalLayout } from "@/components/conditional-layout";
-import { StoreProvider } from "@/store/StoreProvider";
+import {ConditionalLayout} from "@/components/conditional-layout";
+import {StoreProvider} from "@/store/StoreProvider";
 import localFont from "next/font/local";
-import { DialogProvider } from "@/components/providers/DialogProvider";
-import { Footer } from "@/components/Footer";
+import {DialogProvider} from "@/components/providers/DialogProvider";
+import {Footer} from "@/components/Footer";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -22,31 +22,31 @@ export const metadata: Metadata = {
     description:
         "Welcome to the Allchat Ads Portal. Create, manage, and optimize campaigns to reach the right audience and grow your presence across Allchat.",
     icons: {
-        icon: [
-            { url: "/icon.png", type: "image/png", sizes: "16x16" },
-        ],
+        icon: "/icon.png",
+        shortcut: "/icon.png",
+        apple: "/icon.png",
     },
 };
 
 export default function RootLayout({
-    children,
-}: Readonly<{
+                                       children,
+                                   }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en">
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF] pb-10`}
-            >
-                <StoreProvider>
-                    <DialogProvider>
-                        <ConditionalLayout>
-                            {children}
-                        </ConditionalLayout>
-                        <Footer />
-                    </DialogProvider>
-                </StoreProvider>
-            </body>
+        <body
+            className={`${geistSans.variable} ${geistMono.variable} bg-[#E0EEFF] pb-10`}
+        >
+        <StoreProvider>
+            <DialogProvider>
+                <ConditionalLayout>
+                    {children}
+                </ConditionalLayout>
+                <Footer/>
+            </DialogProvider>
+        </StoreProvider>
+        </body>
         </html>
     );
 }

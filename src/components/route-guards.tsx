@@ -44,6 +44,7 @@ export function useAuth(): UseAuthReturn {
 interface RouteGuardProps {
     children: React.ReactNode;
     fallback?: React.ReactNode;
+    redirectTo?: string;
 }
 
 /**
@@ -102,11 +103,11 @@ export function AdminRoute({children, fallback = null}: RouteGuardProps) {
  * Component to protect auth routes (login, register)
  * Redirects to dashboard if user is already authenticated
  */
-export function AuthRoute({children, fallback = null}: RouteGuardProps) {
+export function AuthRoute({children, fallback = null, redirectTo}: RouteGuardProps) {
     const router = useRouter();
     const {isAuthenticated, isAdmin, isLoading} = useAuth();
 
-    const HOME_ROUTE = isAdmin ? '/admin/dashboard' : '/dashboard';
+    const HOME_ROUTE = redirectTo ?? (isAdmin ? '/admin/dashboard' : '/dashboard');
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {

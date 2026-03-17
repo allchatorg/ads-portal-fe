@@ -1,8 +1,8 @@
 'use client'
-import { SiteHeader } from "@/components/site-header";
-import { SavedCard } from "@/components/saved-card";
-import { AddCardForm } from "@/components/add-card-form";
-import { Button } from "@/components/ui/button";
+import {SiteHeader} from "@/components/site-header";
+import {SavedCard} from "@/components/saved-card";
+import {AddCardForm} from "@/components/add-card-form";
+import {Button} from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -11,11 +11,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { IconPlus, IconShieldCheck } from "@tabler/icons-react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import { useGetPaymentMethodsQuery, useRemovePaymentMethodMutation } from "@/store/services/paymentApi";
-import { toast } from "sonner";
+import {IconPlus, IconShieldCheck} from "@tabler/icons-react";
+import {loadStripe} from "@stripe/stripe-js";
+import {Elements} from "@stripe/react-stripe-js";
+import {useGetPaymentMethodsQuery, useRemovePaymentMethodMutation} from "@/store/services/paymentApi";
+import {toast} from "sonner";
+import {useState} from "react";
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_KEY || '';
 console.log("KEY" + publishableKey);
@@ -29,8 +30,9 @@ const stripePromise = isStripeKeyValid ? loadStripe(publishableKey) : null;
 
 
 export default function Page() {
-    const { data: cards, isLoading, error } = useGetPaymentMethodsQuery();
+    const {data: cards, isLoading, error} = useGetPaymentMethodsQuery();
     const [removePaymentMethod] = useRemovePaymentMethodMutation();
+    const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
 
     const handleRemoveCard = async (cardId: string) => {
         try {
@@ -52,7 +54,7 @@ export default function Page() {
 
                 {/* Security Banner */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-3 max-w-3xl">
-                    <IconShieldCheck className="h-6 w-6 text-blue-600 mt-0.5" />
+                    <IconShieldCheck className="h-6 w-6 text-blue-600 mt-0.5"/>
                     <div>
                         <h4 className="text-sm font-semibold text-blue-900">Secure Payment Processing</h4>
                         <p className="text-sm text-blue-700 mt-1">
@@ -65,10 +67,10 @@ export default function Page() {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between max-w-3xl">
                         <h3 className="text-lg font-medium">Saved Cards ({cards?.length || 0})</h3>
-                        <Dialog>
+                        <Dialog open={isAddCardDialogOpen} onOpenChange={setIsAddCardDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    <IconPlus className="mr-2 h-4 w-4" />
+                                    <IconPlus className="mr-2 h-4 w-4"/>
                                     Add Card
                                 </Button>
                             </DialogTrigger>
@@ -81,13 +83,14 @@ export default function Page() {
                                 </DialogHeader>
                                 {stripePromise ? (
                                     <Elements stripe={stripePromise}>
-                                        <AddCardForm />
+                                        <AddCardForm onSuccess={() => setIsAddCardDialogOpen(false)}/>
                                     </Elements>
                                 ) : (
                                     <div className="text-sm text-red-600">
                                         Stripe is not configured correctly. Please set
                                         NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-                                        to your Stripe publishable key (starts with &quot;pk_&quot;) and reload the page.
+                                        to your Stripe publishable key (starts with &quot;pk_&quot;) and reload the
+                                        page.
                                     </div>
                                 )}
                             </DialogContent>
