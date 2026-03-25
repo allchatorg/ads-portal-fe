@@ -1,17 +1,17 @@
 "use client";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useForgotPasswordMutation, useLoginMutation } from "@/store/services/userApi";
-import { useAppDispatch } from "@/store/hooks";
-import { setUser } from "@/store/slices/authSlice";
+import {useState} from "react";
+import {useForm} from "react-hook-form";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {AlertTriangle, CheckCircle2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {Role, useForgotPasswordMutation, useLoginMutation} from "@/store/services/userApi";
+import {useAppDispatch} from "@/store/hooks";
+import {setUser} from "@/store/slices/authSlice";
 
 enum AuthView {
     LOGIN = "LOGIN",
@@ -24,15 +24,15 @@ interface LoginRequest {
 }
 
 export function LoginForm({
-    className,
-    onAuthViewChange,
-    ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
+                              className,
+                              onAuthViewChange,
+                              ...props
+                          }: React.ComponentPropsWithoutRef<"div"> & {
     onAuthViewChange?: (view: AuthView) => void;
 }) {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [login, { isLoading, error: apiError }] = useLoginMutation();
+    const [login, {isLoading, error: apiError}] = useLoginMutation();
     const [forgotPassword] = useForgotPasswordMutation();
     const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
     const [forgotPasswordError, setForgotPasswordError] = useState("");
@@ -41,7 +41,7 @@ export function LoginForm({
         register,
         handleSubmit,
         getValues,
-        formState: { errors },
+        formState: {errors},
     } = useForm<LoginRequest>();
 
     const onSubmit = async (data: LoginRequest) => {
@@ -63,8 +63,8 @@ export function LoginForm({
             // Login successful
             console.log("Login successful:", response.message);
 
-            // Redirect to ads page
-            router.push("/ads");
+            const redirectPath = response.role === Role.ADMIN ? "/admin/dashboard" : "/ads";
+            router.push(redirectPath);
         } catch (err) {
             // Error is handled by RTK Query and displayed below
             console.error("Login failed:", err);
@@ -83,7 +83,7 @@ export function LoginForm({
                 return;
             }
 
-            await forgotPassword({ email }).unwrap();
+            await forgotPassword({email}).unwrap();
             setForgotPasswordSuccess(true);
         } catch (err) {
             console.error("Forgot password failed:", err);
@@ -151,7 +151,7 @@ export function LoginForm({
 
                         {forgotPasswordSuccess && (
                             <Alert className="border-green-200 bg-green-50">
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
                                 <AlertDescription className="m-0 p-0 text-green-800">
                                     Password reset instructions have been sent to your email address.
                                 </AlertDescription>
@@ -160,7 +160,7 @@ export function LoginForm({
 
                         {forgotPasswordError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4"/>
                                 <AlertDescription className="m-0 p-0">
                                     {forgotPasswordError}
                                 </AlertDescription>
@@ -169,7 +169,7 @@ export function LoginForm({
 
                         {apiError && (
                             <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4"/>
                                 <AlertDescription className="m-0 p-0">
                                     {"data" in apiError && typeof apiError.data === "object" && apiError.data && "message" in apiError.data
                                         ? String(apiError.data.message)

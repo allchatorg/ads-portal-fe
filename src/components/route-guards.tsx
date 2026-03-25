@@ -107,7 +107,7 @@ export function AuthRoute({children, fallback = null, redirectTo}: RouteGuardPro
     const router = useRouter();
     const {isAuthenticated, isAdmin, isLoading} = useAuth();
 
-    const HOME_ROUTE = redirectTo ?? (isAdmin ? '/admin/dashboard' : '/dashboard');
+    const HOME_ROUTE = isAdmin ? '/admin/dashboard' : (redirectTo ?? '/dashboard');
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
