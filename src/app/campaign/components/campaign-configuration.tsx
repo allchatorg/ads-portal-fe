@@ -19,6 +19,8 @@ import {AdFormatDto, AdFormatType} from "@/data/adFormats";
 import {MAX_CHAR_COUNT} from "@/utils/pricing-utils";
 import {useUploadFileMutation} from "@/store/services/fileApi";
 import {toast} from "sonner";
+import CampaignPreviewCta from "@/app/campaign/components/campaign-preview-cta";
+import {canPreviewAd, PreviewAdData, resolvePreviewAttachmentUrl} from "@/components/ad-preview/preview-utils";
 
 interface CampaignConfigurationProps {
     selectedFormat: AdFormatDto;
@@ -179,6 +181,22 @@ export default function CampaignConfiguration({
         }
     }
     const Icon = getIcon();
+    const resolvedAttachmentUrl = resolvePreviewAttachmentUrl(details.mediaUrl);
+    const previewAd: PreviewAdData = {
+        brandName: details.name.trim() || null,
+        content: details.text.trim() || null,
+        color: selectedFormat.type === AdFormatType.VIDEO ? "#E11D48" : selectedFormat.type === AdFormatType.PHOTO ? "#0F766E" : "#2563EB",
+        attachmentUrl: resolvedAttachmentUrl,
+        attachmentName: details.media?.name || null,
+        chatRoomName: "launch-lounge",
+        senderCountryCode: "US",
+        senderRole: "USER",
+    };
+    const isPreviewReady = canPreviewAd(selectedFormat.type, previewAd);
+    const isWaitingForMediaPreview = selectedFormat.type !== AdFormatType.TEXT
+        && Boolean(details.name.trim())
+        && Boolean(details.media || details.mediaUrl)
+        && !Boolean(resolvedAttachmentUrl);
 
     return (
         <div className="w-full max-w-4xl mx-auto">
@@ -329,6 +347,13 @@ export default function CampaignConfiguration({
                                             )}
                                         />
                                     )}
+
+                                    <CampaignPreviewCta
+                                        ad={previewAd}
+                                        title={`${selectedFormat.title} Preview`}
+                                        canPreview={isPreviewReady}
+                                        isWaitingForMedia={isWaitingForMediaPreview}
+                                    />
                                 </div>
 
                                 {/* Right Column: Pricing Summary */}

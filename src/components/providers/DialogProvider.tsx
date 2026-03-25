@@ -2,6 +2,7 @@
 import {createContext, ReactNode, useContext, useState} from "react";
 import {Dialog, DialogContent, DialogTitle} from "../ui/dialog";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
+import {cn} from "@/lib/utils";
 
 type DialogContextType = {
     open: (content: ReactNode, options?: { className?: string }) => void;
@@ -25,6 +26,7 @@ export const DialogProvider = ({children}: { children: ReactNode }) => {
 
     const close = () => {
         setOpenDialog(false);
+        setClassName(undefined);
     };
 
     return (
@@ -34,7 +36,7 @@ export const DialogProvider = ({children}: { children: ReactNode }) => {
                 <VisuallyHidden>
                     <DialogTitle>Dialog</DialogTitle>
                 </VisuallyHidden>
-                <DialogContent className={"px-4 py-4 rounded-lg"}>{content}</DialogContent>
+                <DialogContent className={cn("px-4 py-4 rounded-lg", className)}>{content}</DialogContent>
             </Dialog>
         </DialogContext.Provider>
     );

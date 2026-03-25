@@ -18,27 +18,69 @@ import {useDialog} from "@/components/providers/DialogProvider"
 import TermsOfService from "@/components/TermsOfService"
 import PrivacyPolicy from "@/components/PrivacyPolicy"
 import AdvertiserTerms from "@/components/AdvertiserPolicy"
+import {AdFormatType} from "@/data/adFormats";
+import {AdPreviewButton} from "@/components/ad-preview/ad-preview-button";
+import {PreviewAdData} from "@/components/ad-preview/preview-utils";
+
+const PHOTO_PREVIEW_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/330px-Pepsi_2023.svg.png"
+const VIDEO_PREVIEW_URL = "https://cdn.allchat.org/prod/1102098c-04f0-41ac-a567-f63def2480e9_file_example_MP4_1280_10MG-18065933291543641231.mp4"
+
+type HomeAdFormat = {
+    id: number
+    type: AdFormatType
+    title: string
+    description: string
+    previewAd: PreviewAdData
+}
 
 export default function Home() {
     const {open} = useDialog();
-    const adFormats = [
+    const adFormats: HomeAdFormat[] = [
         {
             id: 1,
-            type: "TEXT",
+            type: AdFormatType.TEXT,
             title: "Text Advertisement",
             description: "Simple text-based advertisement",
+            previewAd: {
+                brandName: "Allchat Ads",
+                content: "Promote your next campaign directly inside the conversation and meet customers where they already chat.",
+                color: "#2563EB",
+                chatRoomName: "launch-lounge",
+                senderCountryCode: "US",
+                senderRole: "USER",
+            },
         },
         {
             id: 2,
-            type: "PHOTO",
-            title: "Display / Photo Ad",
+            type: AdFormatType.PHOTO,
+            title: "Photo Ad",
             description: "High-visibility visual format",
+            previewAd: {
+                brandName: "Pepsi",
+                content: "Refresh your next campaign with a strong visual message that feels native in the thread.",
+                color: "#004B93",
+                attachmentUrl: PHOTO_PREVIEW_URL,
+                attachmentName: "pepsi-preview.png",
+                chatRoomName: "launch-lounge",
+                senderCountryCode: "US",
+                senderRole: "USER",
+            },
         },
         {
             id: 3,
-            type: "VIDEO",
+            type: AdFormatType.VIDEO,
             title: "Video Ad",
             description: "Engaging video content",
+            previewAd: {
+                brandName: "Allchat Advert",
+                content: "Show the product in action with a video ad preview embedded right into the chat experience.",
+                color: "#E11D48",
+                attachmentUrl: VIDEO_PREVIEW_URL,
+                attachmentName: "allchat-video-preview.mp4",
+                chatRoomName: "launch-lounge",
+                senderCountryCode: "US",
+                senderRole: "USER",
+            },
         },
     ]
 
@@ -94,37 +136,49 @@ export default function Home() {
                             {adFormats.map((format) => {
                                 let Icon = FileText
                                 switch (format.type) {
-                                    case "TEXT":
+                                    case AdFormatType.TEXT:
                                         Icon = MessageSquare
                                         break
-                                    case "PHOTO":
+                                    case AdFormatType.PHOTO:
                                         Icon = ImageIcon
                                         break
-                                    case "VIDEO":
+                                    case AdFormatType.VIDEO:
                                         Icon = Video
                                         break
                                 }
 
                                 return (
-                                    <Link
+                                    <div
                                         key={format.id}
-                                        href={`/campaign?formatId=${format.id}`}
-                                        className="block h-full"
+                                        className="group relative h-full rounded-3xl bg-white p-6 shadow-lg border border-gray-200 flex flex-col items-start transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl"
                                     >
                                         <div
-                                            className="group relative h-full rounded-3xl bg-white p-6 shadow-lg border border-gray-200 flex flex-col items-start transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
-                                            <div
-                                                className="mb-4 inline-flex items-center justify-center rounded-xl bg-blue-100 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
-                                                <Icon className="h-6 w-6"/>
-                                            </div>
-                                            <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                                                {format.title}
-                                            </h3>
-                                            <p className="text-slate-600 leading-relaxed">
-                                                {format.description}
-                                            </p>
+                                            className="mb-4 inline-flex items-center justify-center rounded-xl bg-blue-100 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
+                                            <Icon className="h-6 w-6"/>
                                         </div>
-                                    </Link>
+                                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                                            {format.title}
+                                        </h3>
+                                        <p className="text-slate-600 leading-relaxed">
+                                            {format.description}
+                                        </p>
+
+                                        <div className="mt-auto flex w-full flex-col gap-3 pt-6">
+                                            <Link
+                                                href={`/campaign?formatId=${format.id}`}
+                                                className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-blue-700"
+                                            >
+                                                Create Campaign
+                                                <ArrowRight className="ml-2 h-4 w-4"/>
+                                            </Link>
+
+                                            <AdPreviewButton
+                                                ad={format.previewAd}
+                                                title={`${format.title} Preview`}
+                                                className="h-auto w-full border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 hover:border-slate-300 hover:bg-white"
+                                            />
+                                        </div>
+                                    </div>
                                 )
                             })}
                         </div>
