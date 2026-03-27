@@ -1,4 +1,4 @@
-import {AdFormatType} from "@/data/adFormats";
+import { AdFormatType } from "@/data/adFormats";
 
 const DEFAULT_PREVIEW_URL = "http://localhost:3000/ad-preview";
 

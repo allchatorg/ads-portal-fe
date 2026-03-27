@@ -1,26 +1,26 @@
 'use client';
 
-import {useCallback, useEffect} from "react";
-import {CampaignDetails, ValidationErrors} from "@/hooks/use-campaign-creator";
-import {CheckCircle2, ChevronLeft, FileText, Image as ImageIcon, Info, Loader2, Play, Upload, X} from "lucide-react";
+import { useCallback, useEffect } from "react";
+import { CampaignDetails, ValidationErrors } from "@/hooks/use-campaign-creator";
+import { CheckCircle2, ChevronLeft, FileText, Image as ImageIcon, Info, Loader2, Play, Upload, X } from "lucide-react";
 
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Button} from "@/components/ui/button";
-import {ActionButton} from "@/components/ui/action-button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/ui/action-button";
 import CostEstimationCard from "./cost-estimation-card";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
-import {AdFormatDto, AdFormatType} from "@/data/adFormats";
-import {MAX_CHAR_COUNT} from "@/utils/pricing-utils";
-import {useUploadFileMutation} from "@/store/services/fileApi";
-import {toast} from "sonner";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
+import { AdFormatDto, AdFormatType } from "@/data/adFormats";
+import { MAX_CHAR_COUNT } from "@/utils/pricing-utils";
+import { useUploadFileMutation } from "@/store/services/fileApi";
+import { toast } from "sonner";
 import CampaignPreviewCta from "@/app/campaign/components/campaign-preview-cta";
-import {canPreviewAd, PreviewAdData, resolvePreviewAttachmentUrl} from "@/components/ad-preview/preview-utils";
+import { canPreviewAd, PreviewAdData, resolvePreviewAttachmentUrl } from "@/components/ad-preview/preview-utils";
 
 interface CampaignConfigurationProps {
     selectedFormat: AdFormatDto;
@@ -33,13 +33,13 @@ interface CampaignConfigurationProps {
 }
 
 export default function CampaignConfiguration({
-                                                  selectedFormat,
-                                                  details,
-                                                  setDetails,
-                                                  adFormats,
-                                                  onNext,
-                                                  onBack
-                                              }: CampaignConfigurationProps) {
+    selectedFormat,
+    details,
+    setDetails,
+    adFormats,
+    onNext,
+    onBack
+}: CampaignConfigurationProps) {
 
     // Dynamic schema based on selectedFormat.type
     const schema = z.object({
@@ -76,7 +76,7 @@ export default function CampaignConfiguration({
         mode: "onChange", // Validate on change for immediate feedback
     });
 
-    const [uploadFile, {isLoading: isUploading}] = useUploadFileMutation();
+    const [uploadFile, { isLoading: isUploading }] = useUploadFileMutation();
 
     // Sync form values to parent state for CostEstimationCard
     // We watch all fields and update parent state
@@ -188,7 +188,7 @@ export default function CampaignConfiguration({
         color: selectedFormat.type === AdFormatType.VIDEO ? "#E11D48" : selectedFormat.type === AdFormatType.PHOTO ? "#0F766E" : "#2563EB",
         attachmentUrl: resolvedAttachmentUrl,
         attachmentName: details.media?.name || null,
-        chatRoomName: "launch-lounge",
+        chatRoomName: "General",
         senderCountryCode: "US",
         senderRole: "USER",
     };
@@ -204,7 +204,7 @@ export default function CampaignConfiguration({
                 <CardHeader className="border-b border-slate-200 px-8 py-6">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                            <Icon className="w-6 h-6 text-indigo-600"/>
+                            <Icon className="w-6 h-6 text-indigo-600" />
                         </div>
                         <div>
                             <CardTitle
@@ -225,7 +225,7 @@ export default function CampaignConfiguration({
                                     <FormField
                                         control={form.control}
                                         name="name"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-sm font-semibold text-slate-700">Campaign
                                                     Name</FormLabel>
@@ -236,7 +236,7 @@ export default function CampaignConfiguration({
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -245,12 +245,12 @@ export default function CampaignConfiguration({
                                     <FormField
                                         control={form.control}
                                         name="text"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <div className="flex justify-between items-center">
                                                     <FormLabel className="text-sm font-semibold text-slate-700">
                                                         Ad Text Content {selectedFormat.type !== AdFormatType.TEXT &&
-                                                        <span className="text-slate-400 font-normal">(Optional)</span>}
+                                                            <span className="text-slate-400 font-normal">(Optional)</span>}
                                                     </FormLabel>
                                                     <span
                                                         className={`text-xs ${field.value?.length && field.value.length >= MAX_CHAR_COUNT ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
@@ -266,7 +266,7 @@ export default function CampaignConfiguration({
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -276,7 +276,7 @@ export default function CampaignConfiguration({
                                         <FormField
                                             control={form.control}
                                             name="media"
-                                            render={({field}) => (
+                                            render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-semibold text-slate-700">
                                                         {selectedFormat.type === AdFormatType.VIDEO ? 'Video Asset' : 'Image Asset'}
@@ -297,7 +297,7 @@ export default function CampaignConfiguration({
                                                                 <div className="flex flex-col items-center gap-3">
                                                                     <div
                                                                         className="p-4 bg-white rounded-full shadow-sm">
-                                                                        <Upload className="w-6 h-6 text-indigo-600"/>
+                                                                        <Upload className="w-6 h-6 text-indigo-600" />
                                                                     </div>
                                                                     <div>
                                                                         <p className="font-medium text-slate-900">Click
@@ -313,7 +313,7 @@ export default function CampaignConfiguration({
                                                                 className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-video flex items-center justify-center group">
                                                                 {selectedFormat.type === AdFormatType.VIDEO ? (
                                                                     <video src={form.getValues('mediaUrl')!} controls
-                                                                           className="max-h-full max-w-full"/>
+                                                                        className="max-h-full max-w-full" />
                                                                 ) : (
                                                                     <img
                                                                         src={form.getValues('mediaUrl')!}
@@ -326,14 +326,14 @@ export default function CampaignConfiguration({
                                                                     onClick={removeMedia}
                                                                     className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white text-red-600 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                                                                 >
-                                                                    <X size={16}/>
+                                                                    <X size={16} />
                                                                 </button>
                                                                 {isUploading && (
                                                                     <div
                                                                         className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 transition-all rounded-xl">
                                                                         <div
                                                                             className="flex flex-col items-center gap-2 text-white">
-                                                                            <Loader2 className="w-8 h-8 animate-spin"/>
+                                                                            <Loader2 className="w-8 h-8 animate-spin" />
                                                                             <span
                                                                                 className="text-sm font-medium">Uploading...</span>
                                                                         </div>
@@ -342,7 +342,7 @@ export default function CampaignConfiguration({
                                                             </div>
                                                         )}
                                                     </FormControl>
-                                                    <FormMessage/>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -375,7 +375,7 @@ export default function CampaignConfiguration({
                                 onClick={onBack}
                                 className="text-slate-600 hover:text-slate-900 hover:bg-slate-200"
                             >
-                                <ChevronLeft className="w-4 h-4 mr-2"/>
+                                <ChevronLeft className="w-4 h-4 mr-2" />
                                 Back
                             </Button>
                             <div className="flex items-center gap-4">
@@ -383,7 +383,7 @@ export default function CampaignConfiguration({
                                     <TooltipTrigger>
                                         <div
                                             className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors cursor-help">
-                                            <Info className="w-4 h-4"/>
+                                            <Info className="w-4 h-4" />
                                             <span className="text-xs">Approval Process</span>
                                         </div>
                                     </TooltipTrigger>

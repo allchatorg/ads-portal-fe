@@ -14,16 +14,16 @@ import {
     Users,
     Video,
 } from "lucide-react"
-import {useDialog} from "@/components/providers/DialogProvider"
+import { useDialog } from "@/components/providers/DialogProvider"
 import TermsOfService from "@/components/TermsOfService"
 import PrivacyPolicy from "@/components/PrivacyPolicy"
 import AdvertiserTerms from "@/components/AdvertiserPolicy"
-import {AdFormatType} from "@/data/adFormats";
-import {AdPreviewButton} from "@/components/ad-preview/ad-preview-button";
-import {PreviewAdData} from "@/components/ad-preview/preview-utils";
+import { AdFormatType } from "@/data/adFormats";
+import { AdPreviewButton } from "@/components/ad-preview/ad-preview-button";
+import { PreviewAdData } from "@/components/ad-preview/preview-utils";
 
-const PHOTO_PREVIEW_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pepsi_2023.svg/330px-Pepsi_2023.svg.png"
-const VIDEO_PREVIEW_URL = "https://cdn.allchat.org/prod/1102098c-04f0-41ac-a567-f63def2480e9_file_example_MP4_1280_10MG-18065933291543641231.mp4"
+const PHOTO_PREVIEW_URL = "https://pub-0041c325ef4f49388686f7b78d23aa40.r2.dev/dev/73bed392-0adc-43cd-8a68-c763be2a45fe_allchat-logo.png"
+const VIDEO_PREVIEW_URL = "https://pub-0041c325ef4f49388686f7b78d23aa40.r2.dev/dev/7415fc9a-2e6a-4ca8-8ce7-32f41cb2a28d_Generated%20Video%20March%2027,%202026%20-%201_43AM.mp4"
 
 type HomeAdFormat = {
     id: number
@@ -34,7 +34,7 @@ type HomeAdFormat = {
 }
 
 export default function Home() {
-    const {open} = useDialog();
+    const { open } = useDialog();
     const adFormats: HomeAdFormat[] = [
         {
             id: 1,
@@ -45,7 +45,7 @@ export default function Home() {
                 brandName: "Allchat Ads",
                 content: "Promote your next campaign directly inside the conversation and meet customers where they already chat.",
                 color: "#2563EB",
-                chatRoomName: "launch-lounge",
+                chatRoomName: "General",
                 senderCountryCode: "US",
                 senderRole: "USER",
             },
@@ -56,12 +56,12 @@ export default function Home() {
             title: "Photo Ad",
             description: "High-visibility visual format",
             previewAd: {
-                brandName: "Pepsi",
+                brandName: "Allchat Advert",
                 content: "Refresh your next campaign with a strong visual message that feels native in the thread.",
                 color: "#004B93",
                 attachmentUrl: PHOTO_PREVIEW_URL,
-                attachmentName: "pepsi-preview.png",
-                chatRoomName: "launch-lounge",
+                attachmentName: "allchat-photo-preview.png",
+                chatRoomName: "General",
                 senderCountryCode: "US",
                 senderRole: "USER",
             },
@@ -77,7 +77,7 @@ export default function Home() {
                 color: "#E11D48",
                 attachmentUrl: VIDEO_PREVIEW_URL,
                 attachmentName: "allchat-video-preview.mp4",
-                chatRoomName: "launch-lounge",
+                chatRoomName: "General",
                 senderCountryCode: "US",
                 senderRole: "USER",
             },
@@ -101,7 +101,7 @@ export default function Home() {
 
                     <div className="text-center max-w-4xl">
                         <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-                            Grow your business on <br className="hidden sm:block"/>
+                            Grow your business on <br className="hidden sm:block" />
                             <span className="text-blue-600">allchat</span>
                         </h1>
                         <p className="mt-6 text-lg text-slate-700 sm:text-xl leading-relaxed max-w-2xl mx-auto">
@@ -115,7 +115,7 @@ export default function Home() {
                             <button
                                 className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-md transition-all duration-200 hover:bg-blue-700 active:scale-95">
                                 Create Ad Account
-                                <ArrowRight className="ml-2 h-4 w-4"/>
+                                <ArrowRight className="ml-2 h-4 w-4" />
                             </button>
                         </Link>
 
@@ -154,7 +154,7 @@ export default function Home() {
                                     >
                                         <div
                                             className="mb-4 inline-flex items-center justify-center rounded-xl bg-blue-100 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
-                                            <Icon className="h-6 w-6"/>
+                                            <Icon className="h-6 w-6" />
                                         </div>
                                         <h3 className="text-xl font-semibold text-slate-900 mb-2">
                                             {format.title}
@@ -169,7 +169,7 @@ export default function Home() {
                                                 className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-blue-700"
                                             >
                                                 Create Campaign
-                                                <ArrowRight className="ml-2 h-4 w-4"/>
+                                                <ArrowRight className="ml-2 h-4 w-4" />
                                             </Link>
 
                                             <AdPreviewButton
@@ -186,12 +186,12 @@ export default function Home() {
 
                     <div className="mt-20 flex flex-wrap justify-center gap-8 text-center text-slate-600 opacity-80">
                         <div className="flex items-center gap-2">
-                            <Users className="h-5 w-5"/>
+                            <Users className="h-5 w-5" />
                             <span className="font-medium">Reaching thousands of daily users</span>
                         </div>
                         <div className="w-px h-6 bg-slate-300 hidden sm:block"></div>
                         <div className="flex items-center gap-2">
-                            <BarChart3 className="h-5 w-5"/>
+                            <BarChart3 className="h-5 w-5" />
                             <span className="font-medium">Real-time performance tracking</span>
                         </div>
                     </div>
@@ -201,32 +201,32 @@ export default function Home() {
                         <div
                             className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-0 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm p-3 sm:p-2">
                             <button
-                                onClick={() => open(<div className="max-w-4xl"><TermsOfService/></div>)}
+                                onClick={() => open(<div className="max-w-4xl"><TermsOfService /></div>)}
                                 className="flex items-center justify-center gap-2.5 rounded-xl px-5 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 active:scale-[0.98]"
                             >
-                                <BookOpen className="h-4 w-4 shrink-0"/>
+                                <BookOpen className="h-4 w-4 shrink-0" />
                                 Terms of Service
                             </button>
 
-                            <div className="hidden sm:block w-px self-stretch bg-slate-200/80 my-1.5"/>
-                            <div className="sm:hidden h-px w-full bg-slate-200/80"/>
+                            <div className="hidden sm:block w-px self-stretch bg-slate-200/80 my-1.5" />
+                            <div className="sm:hidden h-px w-full bg-slate-200/80" />
 
                             <button
-                                onClick={() => open(<div className="max-w-4xl"><PrivacyPolicy/></div>)}
+                                onClick={() => open(<div className="max-w-4xl"><PrivacyPolicy /></div>)}
                                 className="flex items-center justify-center gap-2.5 rounded-xl px-5 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 active:scale-[0.98]"
                             >
-                                <Shield className="h-4 w-4 shrink-0"/>
+                                <Shield className="h-4 w-4 shrink-0" />
                                 Privacy Policy
                             </button>
 
-                            <div className="hidden sm:block w-px self-stretch bg-slate-200/80 my-1.5"/>
-                            <div className="sm:hidden h-px w-full bg-slate-200/80"/>
+                            <div className="hidden sm:block w-px self-stretch bg-slate-200/80 my-1.5" />
+                            <div className="sm:hidden h-px w-full bg-slate-200/80" />
 
                             <button
-                                onClick={() => open(<div className="max-w-4xl"><AdvertiserTerms/></div>)}
+                                onClick={() => open(<div className="max-w-4xl"><AdvertiserTerms /></div>)}
                                 className="flex items-center justify-center gap-2.5 rounded-xl px-5 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 active:scale-[0.98]"
                             >
-                                <FileCheck className="h-4 w-4 shrink-0"/>
+                                <FileCheck className="h-4 w-4 shrink-0" />
                                 Advertiser Terms
                             </button>
                         </div>
