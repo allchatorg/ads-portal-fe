@@ -1,5 +1,5 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import {createApi} from '@reduxjs/toolkit/query/react';
+import {baseQuery} from './baseQuery';
 
 // Role enum matching backend
 export enum Role {
@@ -14,7 +14,8 @@ export interface User {
     lastName: string;
     email: string;
     emailVerified: boolean;
-    phoneNumber?: string;
+    phoneNumber?: string | null;
+    phoneNumberVerificationDate?: string | null;
     subscribedToMarketingEmails: boolean;
     role: Role;
 }
@@ -36,13 +37,23 @@ export interface RegisterRequest {
 
 // Forgot password request
 export interface ForgotPasswordRequest {
-    email: string;
+    email?: string;
+    phoneNumber?: string;
 }
 
 // Reset password request
 export interface ResetPasswordRequest {
     newPassword: string;
     token: string;
+}
+
+export interface PhonePasswordResetVerificationRequest {
+    phoneNumber: string;
+    verificationCode: string;
+}
+
+export interface PhonePasswordResetVerificationResponse {
+    resetToken: string;
 }
 
 // Generic message response
@@ -53,6 +64,14 @@ export interface MessageResponse {
 // Verify email request
 export interface VerifyEmailRequest {
     token: string;
+}
+
+export interface SendPhoneVerificationRequest {
+    phoneNumber: string;
+}
+
+export interface VerifyPhoneRequest {
+    verificationCode: string;
 }
 
 // Change password request
@@ -146,6 +165,15 @@ export const userApi = createApi({
             }),
         }),
 
+        // Verify phone password reset code
+        verifyPhonePasswordReset: builder.mutation<PhonePasswordResetVerificationResponse, PhonePasswordResetVerificationRequest>({
+            query: (data) => ({
+                url: '/auth/forgot-password/verify-phone-code',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
         // Reset password
         resetPassword: builder.mutation<MessageResponse, ResetPasswordRequest>({
             query: (data) => ({
@@ -164,7 +192,7 @@ export const userApi = createApi({
         // Get user by ID
         getUserById: builder.query<User, string>({
             query: (id) => `/users/${id}`,
-            providesTags: (result, error, id) => [{ type: 'User', id }],
+            providesTags: (result, error, id) => [{type: 'User', id}],
         }),
 
         // Get all users (admin only)
@@ -173,20 +201,20 @@ export const userApi = createApi({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.map(({ id }) => ({ type: 'User' as const, id: id.toString() })),
-                        { type: 'User', id: 'LIST' },
+                        ...result.map(({id}) => ({type: 'User' as const, id: id.toString()})),
+                        {type: 'User', id: 'LIST'},
                     ]
-                    : [{ type: 'User', id: 'LIST' }],
+                    : [{type: 'User', id: 'LIST'}],
         }),
 
         // Update user
         updateUser: builder.mutation<User, Partial<User> & { id: number }>({
-            query: ({ id, ...patch }) => ({
+            query: ({id, ...patch}) => ({
                 url: `/users/${id}`,
                 method: 'PATCH',
                 body: patch,
             }),
-            invalidatesTags: (result, error, { id }) => [{ type: 'User', id: id.toString() }],
+            invalidatesTags: (result, error, {id}) => [{type: 'User', id: id.toString()}],
         }),
 
         // Delete user
@@ -195,7 +223,7 @@ export const userApi = createApi({
                 url: `/users/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id) => [{ type: 'User', id: id.toString() }],
+            invalidatesTags: (result, error, id) => [{type: 'User', id: id.toString()}],
         }),
 
         // Send verification email
@@ -210,6 +238,25 @@ export const userApi = createApi({
         verifyEmail: builder.mutation<MessageResponse, VerifyEmailRequest>({
             query: (data) => ({
                 url: '/auth/verify-email',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['User'],
+        }),
+
+        // Send phone verification code
+        sendPhoneVerification: builder.mutation<MessageResponse, SendPhoneVerificationRequest>({
+            query: (data) => ({
+                url: '/auth/send-phone-verification',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // Verify phone code
+        verifyPhone: builder.mutation<User, VerifyPhoneRequest>({
+            query: (data) => ({
+                url: '/auth/verify-phone',
                 method: 'POST',
                 body: data,
             }),
@@ -249,7 +296,7 @@ export const userApi = createApi({
             query: (data) => ({
                 url: '/auth/marketing-preferences',
                 method: 'PATCH',
-                body: { subscribedToMarketingEmails: data.subscribedToMarketingEmails },
+                body: {subscribedToMarketingEmails: data.subscribedToMarketingEmails},
             }),
             invalidatesTags: ['User'],
         }),
@@ -263,6 +310,7 @@ export const {
     useRegisterMutation,
     useLogoutMutation,
     useForgotPasswordMutation,
+    useVerifyPhonePasswordResetMutation,
     useResetPasswordMutation,
     useGetCurrentUserQuery,
     useGetUserByIdQuery,
@@ -271,6 +319,8 @@ export const {
     useDeleteUserMutation,
     useSendVerificationEmailMutation,
     useVerifyEmailMutation,
+    useSendPhoneVerificationMutation,
+    useVerifyPhoneMutation,
     useChangePasswordMutation,
     useRequestEmailUpdateMutation,
     useVerifyEmailUpdateMutation,

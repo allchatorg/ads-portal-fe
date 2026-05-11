@@ -18,9 +18,9 @@ interface User {
 
 interface PhoneSettingsProps {
     user: User
-    onAddPhone?: (phoneNumber: string) => void
-    onVerifyCode?: (code: string) => void
-    onUpdatePhone?: (phoneNumber: string) => void
+    onAddPhone?: (phoneNumber: string) => Promise<void> | void
+    onVerifyCode?: (code: string) => Promise<void> | void
+    onUpdatePhone?: (phoneNumber: string) => Promise<void> | void
     error?: { message?: string } | Error | null
     loading?: boolean
 }
@@ -48,32 +48,67 @@ export const PhoneSettings: React.FC<PhoneSettingsProps> = ({
         return '*'.repeat(phone.length - 4) + lastFour
     }
 
-    const handleAddPhone = () => {
+    const handleAddPhone = async () => {
         if (phoneNumber.trim()) {
-            onAddPhone?.(phoneNumber)
-            setShowVerificationInput(true)
+            try {
+                await onAddPhone?.(phoneNumber)
+                setShowVerificationInput(true)
+            } catch {
+                // Error is surfaced by the parent error prop.
+            }
         }
     }
 
-    const handleUpdatePhone = () => {
+    const handleUpdatePhone = async () => {
         if (phoneNumber.trim() === user.phoneNumber?.trim()) {
             handleCancel()
             return
         }
         if (phoneNumber.trim()) {
-            onUpdatePhone?.(phoneNumber)
-            setIsEditing(false)
-            setShowVerificationInput(true)
+            try {
+                await onUpdatePhone?.(phoneNumber)
+                setIsEditing(false)
+                setShowVerificationInput(true)
+            } catch {
+                // Error is surfaced by the parent error prop.
+            }
         }
     }
 
-    const handleVerifyCode = () => {
-        if (verificationCode.trim()) {
-            onVerifyCode?.(verificationCode)
-            setShowVerificationInput(false)
-            setIsAdding(false)
-            setIsEditing(false)
-            setVerificationCode('')
+    const handleVerifyCode = async () => {
+        if (verificationCode.trim().length === 6) {
+            try {
+                await onVerifyCode?.(verificationCode)
+                setShowVerificationInput(false)
+                setIsAdding(false)
+                setIsEditing(false)
+                setPhoneNumber('')
+                setVerificationCode('')
+            } catch {
+                // Error is surfaced by the parent error prop.
+            }
+        }
+    }
+
+    const handleVerifyExistingPhone = async () => {
+        if (user.phoneNumber) {
+            setPhoneNumber(user.phoneNumber)
+            try {
+                await onAddPhone?.(user.phoneNumber)
+                setShowVerificationInput(true)
+            } catch {
+                // Error is surfaced by the parent error prop.
+            }
+        }
+    }
+
+    const handleResendCode = async () => {
+        if (phoneNumber.trim()) {
+            try {
+                await onAddPhone?.(phoneNumber)
+            } catch {
+                // Error is surfaced by the parent error prop.
+            }
         }
     }
 
@@ -135,7 +170,7 @@ export const PhoneSettings: React.FC<PhoneSettingsProps> = ({
                             </div>
                         </div>
 
-                        {isVerified && (
+                        {isVerified ? (
                             <div className="flex items-center gap-3 rounded-xl border border-green-300 bg-green-50 p-3">
                                 <CheckCircle className="h-6 w-6 text-green-600"/>
                                 <div>
@@ -145,6 +180,23 @@ export const PhoneSettings: React.FC<PhoneSettingsProps> = ({
                                 <Badge variant="default" className="ml-auto">
                                     Verified
                                 </Badge>
+                            </div>
+                        ) : (
+                            <div
+                                className="flex items-center justify-between gap-3 rounded-xl border border-yellow-300 bg-yellow-50 p-3">
+                                <div>
+                                    <p className="font-medium text-yellow-800">Phone Not Verified</p>
+                                    <p className="text-sm text-yellow-700">Verify this number before using phone
+                                        recovery.</p>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleVerifyExistingPhone}
+                                    disabled={loading}
+                                >
+                                    Verify
+                                </Button>
                             </div>
                         )}
                     </div>
@@ -189,12 +241,15 @@ export const PhoneSettings: React.FC<PhoneSettingsProps> = ({
                                 <Input
                                     id="verification-code"
                                     value={verificationCode}
-                                    onChange={(e) => setVerificationCode(e.target.value)}
+                                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                                     placeholder="123456"
+                                    inputMode="numeric"
+                                    autoComplete="one-time-code"
                                     maxLength={6}
                                     disabled={loading}
                                 />
-                                <Button onClick={handleVerifyCode} disabled={!verificationCode.trim() || loading}>
+                                <Button onClick={handleVerifyCode}
+                                        disabled={verificationCode.trim().length !== 6 || loading}>
                                     Verify
                                 </Button>
                             </div>
@@ -205,6 +260,7 @@ export const PhoneSettings: React.FC<PhoneSettingsProps> = ({
                                 variant="ghost"
                                 size="sm"
                                 className="px-0 text-sm text-muted-foreground hover:text-primary"
+                                onClick={handleResendCode}
                                 disabled={loading}
                             >
                                 Resend Code

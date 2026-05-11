@@ -3,16 +3,13 @@
 import React, {Suspense, useEffect, useState} from "react";
 import {LoginForm} from "@/app/login/components/LoginForm";
 import {RegisterForm} from "@/app/login/components/RegisterForm";
+import {ForgotPasswordForm} from "@/app/login/components/ForgotPasswordForm";
+import {AuthView} from "@/app/login/components/auth-view";
 import {AnimatePresence, motion} from "framer-motion";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image";
 import {Card} from "@/components/ui/card";
 import {AuthRoute} from "@/components/route-guards";
-
-enum AuthView {
-    LOGIN = "LOGIN",
-    REGISTER = "REGISTER",
-}
 
 const AuthPageContent: React.FC = () => {
     const searchParams = useSearchParams();
@@ -26,6 +23,8 @@ const AuthPageContent: React.FC = () => {
             setView(AuthView.LOGIN);
         } else if (viewParam === "register") {
             setView(AuthView.REGISTER);
+        } else if (viewParam === "forgot-password") {
+            setView(AuthView.FORGOT_PASSWORD);
         }
     }, [searchParams]);
 
@@ -33,6 +32,7 @@ const AuthPageContent: React.FC = () => {
         const viewMap = {
             [AuthView.LOGIN]: "login",
             [AuthView.REGISTER]: "register",
+            [AuthView.FORGOT_PASSWORD]: "forgot-password",
         } as const;
 
         router.push(`?view=${viewMap[newView]}`);
@@ -83,6 +83,18 @@ const AuthPageContent: React.FC = () => {
                                     transition={{duration: 0.3}}
                                 >
                                     <RegisterForm className="" onAuthViewChange={handleAuthViewChange}/>
+                                </motion.div>
+                            )}
+                            {view === AuthView.FORGOT_PASSWORD && (
+                                <motion.div
+                                    key="forgot-password"
+                                    className="w-full"
+                                    initial={{opacity: 0}}
+                                    animate={{opacity: 1}}
+                                    exit={{opacity: 0}}
+                                    transition={{duration: 0.3}}
+                                >
+                                    <ForgotPasswordForm className="" onAuthViewChange={handleAuthViewChange}/>
                                 </motion.div>
                             )}
                         </AnimatePresence>

@@ -1,5 +1,4 @@
 "use client";
-import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
@@ -7,16 +6,12 @@ import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Alert, AlertDescription} from "@/components/ui/alert";
-import {AlertTriangle, CheckCircle2} from "lucide-react";
+import {AlertTriangle} from "lucide-react";
 import {useRouter} from "next/navigation";
-import {Role, useForgotPasswordMutation, useLoginMutation} from "@/store/services/userApi";
+import {Role, useLoginMutation} from "@/store/services/userApi";
 import {useAppDispatch} from "@/store/hooks";
 import {setUser} from "@/store/slices/authSlice";
-
-enum AuthView {
-    LOGIN = "LOGIN",
-    REGISTER = "REGISTER",
-}
+import {AuthView} from "@/app/login/components/auth-view";
 
 interface LoginRequest {
     email: string;
@@ -33,14 +28,10 @@ export function LoginForm({
     const router = useRouter();
     const dispatch = useAppDispatch();
     const [login, {isLoading, error: apiError}] = useLoginMutation();
-    const [forgotPassword] = useForgotPasswordMutation();
-    const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
-    const [forgotPasswordError, setForgotPasswordError] = useState("");
 
     const {
         register,
         handleSubmit,
-        getValues,
         formState: {errors},
     } = useForm<LoginRequest>();
 
@@ -71,27 +62,9 @@ export function LoginForm({
         }
     };
 
-    const handleForgotPassword = async (e: React.MouseEvent) => {
+    const handleForgotPassword = (e: React.MouseEvent) => {
         e.preventDefault();
-        setForgotPasswordError("");
-        setForgotPasswordSuccess(false);
-
-        try {
-            const email = getValues("email");
-            if (!email) {
-                setForgotPasswordError("Please enter your email address first.");
-                return;
-            }
-
-            await forgotPassword({email}).unwrap();
-            setForgotPasswordSuccess(true);
-        } catch (err) {
-            console.error("Forgot password failed:", err);
-            const error = err as { data?: { message?: string } }
-            setForgotPasswordError(
-                error?.data?.message || "Failed to send reset email. Please check your email address."
-            );
-        }
+        onAuthViewChange?.(AuthView.FORGOT_PASSWORD);
     };
 
     return (
@@ -148,24 +121,6 @@ export function LoginForm({
                                 <p className="text-sm text-red-500">{errors.password.message}</p>
                             )}
                         </div>
-
-                        {forgotPasswordSuccess && (
-                            <Alert className="border-green-200 bg-green-50">
-                                <CheckCircle2 className="h-4 w-4 text-green-600"/>
-                                <AlertDescription className="m-0 p-0 text-green-800">
-                                    Password reset instructions have been sent to your email address.
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
-                        {forgotPasswordError && (
-                            <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4"/>
-                                <AlertDescription className="m-0 p-0">
-                                    {forgotPasswordError}
-                                </AlertDescription>
-                            </Alert>
-                        )}
 
                         {apiError && (
                             <Alert variant="destructive">

@@ -17,11 +17,7 @@ import {useDialog} from "@/components/providers/DialogProvider";
 import TermsOfService from "@/components/TermsOfService";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
 import AdvertiserTerms from "@/components/AdvertiserPolicy";
-
-enum AuthView {
-    LOGIN = "LOGIN",
-    REGISTER = "REGISTER",
-}
+import {AuthView} from "@/app/login/components/auth-view";
 
 interface RegisterFormData {
     firstName: string;
@@ -71,8 +67,14 @@ export function RegisterForm({
         setSuccess(null);
 
         try {
-            // Remove confirmPassword before sending to API
-            const {confirmPassword: _, ...registerData} = data;
+            const registerData = {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password,
+                isOver18: data.isOver18,
+                acceptsPolicies: data.acceptsPolicies,
+            };
 
             const response = await registerUser(registerData).unwrap();
 
